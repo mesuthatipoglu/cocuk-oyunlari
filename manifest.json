@@ -1,0 +1,18 @@
+{
+  "name": "Çocuk Oyunları (3-6 Yaş) - PBS KIDS & Tablet Oyunları",
+  "short_name": "Çocuk Oyunları",
+  "description": "3-6 Yaş Okul Öncesi Çocuk Oyunları: PBS KIDS En İyi 5 Oyunu ve En Çok Tutulan 3-6 Yaş Tablet Oyunu",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#151e3f",
+  "theme_color": "#1e1b4b",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
