@@ -1,17 +1,18 @@
 :root {
-  --bg-top: #1a103c;
-  --bg-mid: #162447;
-  --bg-bot: #0f172a;
-  --panel-bg: rgba(24, 34, 72, 0.92);
-  --card-bg: rgba(33, 47, 94, 0.88);
-  --cyan: #00f2fe;
-  --yellow: #ffd93d;
-  --orange: #ff8c32;
-  --pink: #ff5e8e;
-  --green: #2ecc71;
-  --purple: #a66cff;
-  --text-light: #ffffff;
-  --text-soft: #cbd5e1;
+  --sky-top: #60a5fa;
+  --sky-mid: #bae6fd;
+  --meadow-bot: #bbf7d0;
+  --panel-bg: rgba(255, 255, 255, 0.95);
+  --card-bg: #ffffff;
+  --cyan: #0ea5e9;
+  --yellow: #f59e0b;
+  --sunny: #fde047;
+  --orange: #fb923c;
+  --pink: #ec4899;
+  --green: #22c55e;
+  --purple: #8b5cf6;
+  --text-dark: #1e293b;
+  --text-muted: #475569;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -31,9 +32,9 @@ html, body {
   height: 100%;
   height: 100dvh;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 15%, #2b1d62 0%, #151e3f 55%, #0c1228 100%);
-  color: var(--text-light);
-  font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(180deg, #7dd3fc 0%, #e0f2fe 45%, #fef9c3 78%, #bbf7d0 100%);
+  color: var(--text-dark);
+  font-family: 'Nunito', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 #app-root {
@@ -62,14 +63,15 @@ html, body {
   display: none !important;
 }
 
-/* ==================== ARKA PLAN DEKORU ==================== */
+/* ==================== SEVİMLİ GÜNDÜZ & BULUT DEKORU ==================== */
 .bg-clouds {
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(255, 217, 61, 0.14) 0%, transparent 25%),
-    radial-gradient(circle at 85% 25%, rgba(0, 242, 254, 0.14) 0%, transparent 28%),
-    radial-gradient(circle at 50% 80%, rgba(255, 94, 142, 0.14) 0%, transparent 30%);
+    radial-gradient(circle at 12% 14%, rgba(253, 224, 71, 0.75) 0%, rgba(253, 224, 71, 0) 18%),
+    radial-gradient(circle at 85% 18%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 20%),
+    radial-gradient(circle at 25% 32%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 16%),
+    radial-gradient(circle at 70% 75%, rgba(244, 114, 182, 0.18) 0%, transparent 28%);
   pointer-events: none;
   z-index: 0;
 }
@@ -83,11 +85,10 @@ html, body {
   max-height: 100%;
   overflow-y: auto;
   background: var(--panel-bg);
-  border: 2px solid rgba(255, 217, 61, 0.45);
-  border-radius: 26px;
+  border: 4px solid #fbbf24;
+  border-radius: 30px;
   padding: 16px 18px;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65), 0 0 32px rgba(0, 242, 254, 0.18);
-  backdrop-filter: blur(14px);
+  box-shadow: 0 14px 36px rgba(14, 165, 233, 0.22), 0 0 0 6px rgba(255, 255, 255, 0.65);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -110,25 +111,26 @@ html, body {
 
 .btn-portal-back {
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-  color: #fff;
-  padding: 6px 13px;
+  background: #e0f2fe;
+  border: 2px solid #38bdf8;
+  color: #0369a1;
+  padding: 6px 14px;
   border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 800;
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: 0 3px 0 #7dd3fc;
 }
 
 .version-badge {
   display: inline-block;
-  padding: 5px 13px;
+  padding: 5px 14px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1.5px solid rgba(0, 242, 254, 0.55);
-  color: var(--cyan);
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  color: #b45309;
   font-family: monospace;
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.8rem;
+  font-weight: 900;
 }
 
 .badge-row {
@@ -139,52 +141,53 @@ html, body {
 }
 
 .pill-badge {
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 900;
-  padding: 4px 12px;
+  padding: 5px 13px;
   border-radius: 999px;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
 }
 
 .pill-badge.rainbow {
-  background: linear-gradient(90deg, #ff5e8e, #ff8c32);
-  color: #fff;
+  background: linear-gradient(90deg, #ec4899, #fb923c);
+  color: #ffffff;
+  box-shadow: 0 3px 8px rgba(236, 72, 153, 0.3);
 }
 
 .pill-badge.gold {
-  background: rgba(255, 217, 61, 0.2);
-  color: var(--yellow);
-  border: 1px solid rgba(255, 217, 61, 0.6);
+  background: #fef08a;
+  color: #854d0e;
+  border: 2px solid #facc15;
 }
 
 .pill-badge.cyan {
-  background: rgba(0, 242, 254, 0.18);
-  color: var(--cyan);
-  border: 1px solid rgba(0, 242, 254, 0.6);
+  background: #cffafe;
+  color: #0e7490;
+  border: 2px solid #22d3ee;
 }
 
 .main-logo {
-  font-size: clamp(1.7rem, 4.5vw, 2.75rem);
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
   font-weight: 900;
   line-height: 1.1;
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
 }
 
 .logo-kids {
-  color: #ffd93d;
+  color: #ec4899;
+  text-shadow: 0 3px 0 #fbcfe8;
 }
 
 .logo-age {
   display: inline-block;
   margin-left: 8px;
-  background: linear-gradient(135deg, #00f2fe, #ff5e8e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0284c7;
+  text-shadow: 0 3px 0 #bae6fd;
 }
 
 .main-subtitle {
-  font-size: 0.9rem;
-  color: var(--text-soft);
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text-muted);
   max-width: 760px;
   margin: 0 auto;
 }
@@ -199,21 +202,22 @@ html, body {
 }
 
 .stat-pill {
-  background: rgba(255, 217, 61, 0.16);
-  border: 1.5px solid rgba(255, 217, 61, 0.6);
-  color: var(--yellow);
-  padding: 6px 14px;
+  background: #fef9c3;
+  border: 2.5px solid #facc15;
+  color: #854d0e;
+  padding: 7px 16px;
   border-radius: 999px;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 900;
+  box-shadow: 0 3px 0 #fde047;
 }
 
 /* ==================== ÇOCUK OYUNLARI MENÜSÜ BAR ==================== */
 .kids-menu-nav {
-  background: rgba(13, 20, 46, 0.82);
-  border: 1.5px solid rgba(0, 242, 254, 0.35);
-  border-radius: 18px;
-  padding: 10px 12px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #fdf2f8 100%);
+  border: 3px solid #7dd3fc;
+  border-radius: 22px;
+  padding: 10px 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -221,10 +225,10 @@ html, body {
 
 .kids-menu-title {
   text-align: center;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   font-weight: 900;
-  color: var(--yellow);
-  letter-spacing: 0.7px;
+  color: #db2777;
+  letter-spacing: 0.5px;
 }
 
 .category-tabs {
@@ -234,36 +238,38 @@ html, body {
 }
 
 .cat-tab {
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.06);
-  color: #e2e8f0;
-  border-radius: 12px;
-  padding: 9px 10px;
-  font-size: 0.84rem;
+  border: 2.5px solid #bae6fd;
+  background: #ffffff;
+  color: #0369a1;
+  border-radius: 16px;
+  padding: 10px 12px;
+  font-size: 0.86rem;
   font-weight: 900;
   cursor: pointer;
   transition: all 0.15s ease;
+  box-shadow: 0 4px 0 #bae6fd;
 }
 
 .cat-tab.active {
-  background: linear-gradient(135deg, #ff5e8e, #ff8c32);
-  color: #fff;
-  border-color: #fff;
-  box-shadow: 0 4px 15px rgba(255, 94, 142, 0.45);
+  background: linear-gradient(135deg, #ec4899, #fb923c);
+  color: #ffffff;
+  border-color: #f43f5e;
+  box-shadow: 0 4px 0 #be185d;
+  transform: translateY(-1px);
 }
 
 /* ==================== OYUN KARTLARI IZGARASI ==================== */
 .games-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 14px;
 }
 
 .kid-game-card {
-  background: var(--card-bg);
-  border: 2.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  padding: 14px;
+  background: #ffffff;
+  border: 3.5px solid #38bdf8;
+  border-radius: 24px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -272,17 +278,19 @@ html, body {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.14);
 }
 
 .kid-game-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(14, 165, 233, 0.24);
 }
 
 .kid-game-card.featured-tablet {
   grid-column: 1 / -1;
-  background: linear-gradient(135deg, rgba(64, 24, 96, 0.94) 0%, rgba(22, 48, 98, 0.94) 100%);
-  border-width: 3px;
+  background: linear-gradient(135deg, #fff1f2 0%, #fefce8 50%, #f0fdf4 100%);
+  border-width: 4px;
+  border-color: #ec4899;
 }
 
 .kg-top {
@@ -292,15 +300,15 @@ html, body {
 }
 
 .kg-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.35rem;
+  font-size: 2.5rem;
   flex-shrink: 0;
-  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .kg-meta {
@@ -315,29 +323,30 @@ html, body {
 }
 
 .kg-tag {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 900;
-  padding: 2px 9px;
+  padding: 3px 10px;
   border-radius: 999px;
 }
 
 .kg-meta h3 {
-  font-size: 1.08rem;
+  font-size: 1.12rem;
   font-weight: 900;
   line-height: 1.2;
 }
 
 .kg-skill {
-  font-size: 0.78rem;
-  color: #fde047;
+  font-size: 0.8rem;
+  color: #d97706;
   font-weight: 800;
   margin-top: 2px;
 }
 
 .kg-desc {
-  font-size: 0.82rem;
-  color: #e2e8f0;
-  line-height: 1.4;
+  font-size: 0.85rem;
+  color: #334155;
+  font-weight: 600;
+  line-height: 1.42;
 }
 
 .kg-modes-preview {
@@ -347,13 +356,13 @@ html, body {
 }
 
 .kg-mode-chip {
-  font-size: 0.73rem;
+  font-size: 0.76rem;
   font-weight: 800;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
   padding: 4px 10px;
-  border-radius: 10px;
-  color: #fff;
+  border-radius: 12px;
+  color: #1e293b;
 }
 
 .kg-footer {
@@ -365,15 +374,18 @@ html, body {
 }
 
 .kg-progress {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 900;
-  color: var(--yellow);
+  color: #b45309;
+  background: #fef3c7;
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 
 /* ==================== GENEL BUTONLAR ==================== */
 .btn {
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 11px 18px;
   font-size: 0.95rem;
   font-weight: 900;
@@ -382,7 +394,7 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  color: #fff;
+  color: #ffffff;
   transition: transform 0.1s ease, filter 0.15s ease;
 }
 
@@ -391,35 +403,41 @@ html, body {
 }
 
 .btn-sm {
-  padding: 8px 13px;
-  font-size: 0.82rem;
-  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 0.84rem;
+  border-radius: 14px;
 }
 
 .btn-xl {
   padding: 15px 24px;
   font-size: 1.15rem;
-  border-radius: 18px;
+  border-radius: 20px;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #ff5e8e 0%, #ff8c32 100%);
-  box-shadow: 0 5px 16px rgba(255, 94, 142, 0.45);
+  background: linear-gradient(135deg, #ec4899 0%, #fb923c 100%);
+  box-shadow: 0 4px 0 #be185d;
+  color: #ffffff;
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: #e0f2fe;
+  border: 2px solid #38bdf8;
+  color: #0369a1;
+  box-shadow: 0 3px 0 #7dd3fc;
 }
 
 .btn-gold {
-  background: linear-gradient(135deg, #ffd93d 0%, #ff9f1c 100%);
-  color: #1e1b4b;
+  background: linear-gradient(135deg, #fde047 0%, #f59e0b 100%);
+  color: #78350f;
+  border: 2px solid #f59e0b;
+  box-shadow: 0 3px 0 #d97706;
 }
 
 .btn-outline {
-  background: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.35);
+  background: #ffffff;
+  border: 2.5px solid #94a3b8;
+  color: #334155;
 }
 
 /* ==================== OYUN DETAY & AŞAMA SEÇİM PANELİ ==================== */
@@ -428,14 +446,14 @@ html, body {
   max-width: 960px;
   max-height: 94dvh;
   overflow-y: auto;
-  background: var(--panel-bg);
-  border: 2.5px solid rgba(0, 242, 254, 0.5);
-  border-radius: 24px;
-  padding: 16px;
+  background: #ffffff;
+  border: 4px solid #38bdf8;
+  border-radius: 28px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 18px 45px rgba(14, 165, 233, 0.25);
 }
 
 .panel-header {
@@ -444,7 +462,7 @@ html, body {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 2px dashed #bae6fd;
   padding-bottom: 10px;
 }
 
@@ -455,13 +473,13 @@ html, body {
 }
 
 .gm-big-icon {
-  font-size: 2.3rem;
+  font-size: 2.5rem;
 }
 
 .gm-badge {
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   font-weight: 900;
-  color: var(--yellow);
+  color: #d97706;
 }
 
 .gm-info-bar {
@@ -469,23 +487,25 @@ html, body {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 14px;
+  background: #f0f9ff;
+  border: 2px solid #bae6fd;
+  border-radius: 16px;
   padding: 10px 14px;
 }
 
 .gm-info-bar p {
-  font-size: 0.88rem;
-  color: #e2e8f0;
+  font-size: 0.9rem;
+  color: #1e293b;
+  font-weight: 700;
   line-height: 1.4;
 }
 
 .section-subtitle {
-  font-size: 0.84rem;
+  font-size: 0.88rem;
   font-weight: 900;
-  color: var(--cyan);
+  color: #0284c7;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .modes-row {
@@ -495,12 +515,12 @@ html, body {
 }
 
 .mode-select-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.22);
-  border-radius: 16px;
+  background: #f8fafc;
+  border: 3px solid #cbd5e1;
+  border-radius: 18px;
   padding: 12px;
-  color: #fff;
-  font-size: 0.9rem;
+  color: #1e293b;
+  font-size: 0.92rem;
   font-weight: 900;
   cursor: pointer;
   display: flex;
@@ -509,12 +529,13 @@ html, body {
   gap: 5px;
   text-align: center;
   transition: all 0.15s ease;
+  box-shadow: 0 4px 0 #cbd5e1;
 }
 
 .mode-select-btn.active {
-  background: linear-gradient(135deg, rgba(0, 242, 254, 0.28), rgba(166, 108, 255, 0.35));
-  border-color: var(--yellow);
-  box-shadow: 0 0 16px rgba(255, 217, 61, 0.4);
+  background: linear-gradient(135deg, #fef9c3, #fce7f3);
+  border-color: #ec4899;
+  box-shadow: 0 4px 0 #f43f5e;
 }
 
 .levels-grid {
@@ -527,42 +548,46 @@ html, body {
 }
 
 .lvl-card {
-  background: rgba(255, 255, 255, 0.09);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
+  background: #f0f9ff;
+  border: 2.5px solid #7dd3fc;
+  border-radius: 16px;
   padding: 10px 6px;
   text-align: center;
   cursor: pointer;
   transition: transform 0.12s ease;
+  box-shadow: 0 3px 0 #bae6fd;
 }
 
 .lvl-card:hover {
   transform: scale(1.04);
-  border-color: var(--yellow);
+  border-color: #f59e0b;
+  background: #fef9c3;
 }
 
 .lvl-num {
-  font-size: 1rem;
+  font-size: 1.02rem;
   font-weight: 900;
-  color: #fff;
+  color: #0369a1;
 }
 
 .lvl-mode-tag {
-  font-size: 0.66rem;
-  color: #cbd5e1;
+  font-size: 0.68rem;
+  color: #475569;
+  font-weight: 800;
   margin: 2px 0;
 }
 
 .lvl-stars {
-  font-size: 0.78rem;
-  color: var(--yellow);
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #d97706;
 }
 
-/* ==================== OYNANIŞ EKRANI (PLAY SCREEN) ==================== */
+/* ==================== OYNANIŞ EKRANI (SEVİMLİ GÜNDÜZ TEMASI) ==================== */
 #play-screen {
   padding: var(--safe-top) 0 var(--safe-bottom) 0;
   justify-content: space-between;
-  background: #0e152d;
+  background: linear-gradient(180deg, #bae6fd 0%, #fef9c3 60%, #bbf7d0 100%);
   touch-action: none;
 }
 
@@ -573,9 +598,11 @@ html, body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 6px 12px;
-  background: rgba(15, 23, 48, 0.92);
-  border-bottom: 2px solid rgba(255, 217, 61, 0.35);
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 3px solid #fbbf24;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.15);
   flex-shrink: 0;
 }
 
@@ -586,33 +613,34 @@ html, body {
 }
 
 .hud-game-title {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 900;
-  color: var(--yellow);
+  color: #db2777;
 }
 
 .hud-level-label {
-  font-size: 0.72rem;
-  color: var(--cyan);
+  font-size: 0.75rem;
+  color: #0284c7;
   font-weight: 800;
 }
 
 .hud-pill {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-  padding: 5px 11px;
+  background: #fef9c3;
+  border: 2px solid #facc15;
+  color: #854d0e;
+  padding: 5px 12px;
   border-radius: 999px;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 900;
 }
 
 .hud-icon-btn {
-  background: rgba(255, 255, 255, 0.14);
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: #e0f2fe;
+  border: 2px solid #38bdf8;
   border-radius: 12px;
-  width: 38px;
-  height: 38px;
-  font-size: 1.1rem;
+  width: 40px;
+  height: 40px;
+  font-size: 1.15rem;
   cursor: pointer;
 }
 
@@ -624,12 +652,14 @@ html, body {
   justify-content: center;
   width: 100%;
   overflow: hidden;
+  padding: 4px;
 }
 
 #kids-canvas {
   display: block;
-  border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 0 0 3px rgba(255, 217, 61, 0.45);
+  background: #fffdf7;
+  border-radius: 24px;
+  box-shadow: 0 10px 28px rgba(14, 165, 233, 0.22), 0 0 0 4px #fbbf24;
   touch-action: none;
   cursor: pointer;
 }
@@ -639,29 +669,31 @@ html, body {
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 23, 42, 0.92);
-  border: 2px solid var(--yellow);
-  color: #fff;
+  background: #ffffff;
+  border: 3px solid #f59e0b;
+  color: #1e293b;
   padding: 8px 18px;
   border-radius: 999px;
   font-size: 0.95rem;
   font-weight: 900;
   pointer-events: none;
   z-index: 15;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* ==================== ALT DOKUNMATİK KONTROL BARI ==================== */
 .kids-touch-bar {
   width: 100%;
   max-width: 1120px;
-  background: rgba(15, 23, 48, 0.95);
-  border-top: 2px solid rgba(0, 242, 254, 0.35);
-  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border-top: 3px solid #38bdf8;
+  border-radius: 20px 20px 0 0;
+  padding: 7px 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   flex-shrink: 0;
+  box-shadow: 0 -4px 14px rgba(14, 165, 233, 0.12);
 }
 
 .touch-mode-buttons {
@@ -672,21 +704,21 @@ html, body {
 }
 
 .touch-mode-chip {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-  color: #fff;
-  padding: 5px 12px;
+  background: #f1f5f9;
+  border: 2px solid #cbd5e1;
+  color: #334155;
+  padding: 6px 13px;
   border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.8rem;
+  font-weight: 900;
   cursor: pointer;
 }
 
 .touch-mode-chip.active {
-  background: linear-gradient(135deg, #00f2fe, #4facfe);
-  color: #0f172a;
-  border-color: #fff;
-  font-weight: 900;
+  background: linear-gradient(135deg, #ec4899, #fb923c);
+  color: #ffffff;
+  border-color: #be185d;
+  box-shadow: 0 2px 0 #be185d;
 }
 
 .touch-dpad-row {
@@ -696,14 +728,15 @@ html, body {
 }
 
 .t-ctrl-btn {
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  background: rgba(30, 45, 90, 0.9);
-  color: #fff;
-  border-radius: 14px;
+  border: 2.5px solid #38bdf8;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 16px;
   padding: 10px 6px;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 900;
   cursor: pointer;
+  box-shadow: 0 3px 0 #7dd3fc;
 }
 
 .t-ctrl-btn:active {
@@ -711,11 +744,17 @@ html, body {
 }
 
 .t-jump-btn {
-  background: linear-gradient(135deg, #2ecc71, #00b894);
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #ffffff;
+  border-color: #16a34a;
+  box-shadow: 0 3px 0 #15803d;
 }
 
 .t-action-btn {
-  background: linear-gradient(135deg, #ff5e8e, #ff8c32);
+  background: linear-gradient(135deg, #ec4899, #fb923c);
+  color: #ffffff;
+  border-color: #db2777;
+  box-shadow: 0 3px 0 #be185d;
 }
 
 .touch-helper-row {
@@ -726,9 +765,9 @@ html, body {
 }
 
 .touch-instruction-text {
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: var(--yellow);
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #0369a1;
   text-align: center;
   flex: 1;
 }
@@ -737,8 +776,8 @@ html, body {
 .game-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(10, 15, 35, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(14, 165, 233, 0.35);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -749,44 +788,45 @@ html, body {
 .overlay-card {
   width: 100%;
   max-width: 480px;
-  background: linear-gradient(160deg, #231955 0%, #14244d 100%);
-  border: 3px solid var(--yellow);
-  border-radius: 26px;
-  padding: 22px;
+  background: #ffffff;
+  border: 4px solid #fbbf24;
+  border-radius: 30px;
+  padding: 24px;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
 }
 
 .cel-big-emoji {
-  font-size: 3.6rem;
+  font-size: 3.8rem;
 }
 
 .cel-stars {
-  font-size: 2.2rem;
+  font-size: 2.3rem;
   letter-spacing: 6px;
 }
 
 .cel-fact-box {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1.5px solid rgba(0, 242, 254, 0.45);
-  border-radius: 14px;
-  padding: 10px 12px;
-  font-size: 0.86rem;
-  color: #f8fafc;
+  background: #f0f9ff;
+  border: 2px solid #7dd3fc;
+  border-radius: 16px;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0369a1;
   line-height: 1.4;
 }
 
 .cel-sticker-reward {
-  background: rgba(255, 217, 61, 0.18);
-  border: 2px dashed var(--yellow);
-  border-radius: 14px;
-  padding: 8px 12px;
-  font-size: 0.9rem;
+  background: #fef9c3;
+  border: 2.5px dashed #f59e0b;
+  border-radius: 16px;
+  padding: 10px 12px;
+  font-size: 0.92rem;
   font-weight: 900;
-  color: var(--yellow);
+  color: #b45309;
 }
 
 .overlay-actions {
@@ -798,8 +838,9 @@ html, body {
 
 /* ==================== ÇIKARTMA ALBÜMÜ ==================== */
 .album-desc {
-  font-size: 0.88rem;
-  color: var(--text-soft);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
 }
 
 .stickers-grid {
@@ -809,8 +850,8 @@ html, body {
 }
 
 .sticker-card {
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: #f8fafc;
+  border: 2.5px solid #cbd5e1;
   border-radius: 18px;
   padding: 12px 8px;
   text-align: center;
@@ -819,12 +860,13 @@ html, body {
 }
 
 .sticker-card.unlocked {
-  background: linear-gradient(135deg, rgba(255, 217, 61, 0.2), rgba(0, 242, 254, 0.18));
-  border-color: var(--yellow);
+  background: linear-gradient(135deg, #fef9c3, #e0f2fe);
+  border-color: #f59e0b;
+  box-shadow: 0 4px 0 #fde047;
 }
 
 .sticker-card.locked {
-  opacity: 0.45;
+  opacity: 0.5;
   filter: grayscale(1);
 }
 
@@ -833,8 +875,9 @@ html, body {
 }
 
 .sticker-name {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 900;
+  color: #1e293b;
   margin-top: 4px;
 }
 
@@ -853,6 +896,6 @@ html, body {
     grid-template-columns: repeat(3, 1fr);
   }
   .touch-instruction-text {
-    font-size: 0.76rem;
+    font-size: 0.78rem;
   }
 }

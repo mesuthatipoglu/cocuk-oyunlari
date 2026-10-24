@@ -14,19 +14,22 @@ class KidsGamesPortal {
     this.levelNum = 1;
     this.state = "HUB"; // HUB, MENU, PLAYING, CELEBRATION
 
-    // Oyun içi ilerleme
     this.stepProgress = 0;
-    this.stepTarget = 5;
-    this.sessionStars = 0;
+    this.stepTarget = 4;
 
-    // Ekran ölçüm ve bileşen yerleşim metrikleri
     this.layout = {
       width: 640,
       height: 480,
       dpr: 1,
       scale: 1,
-      unit: 40,
-      pad: 16
+      unit: 48,
+      pad: 16,
+      headerH: 64,
+      playTop: 80,
+      playH: 380,
+      fontLg: 22,
+      fontMd: 16,
+      fontSm: 13
     };
 
     this.particles = [];
@@ -35,13 +38,77 @@ class KidsGamesPortal {
     this.animTime = 0;
     this.lastFrame = performance.now();
 
-    // Aktif oyunun bileşen durumu
-    this.gs = {};
+    // Her zaman güvenli varsayılanlarla başlatılan oyun durumu
+    this.gs = this.createEmptyGameState();
 
     this.save = this.loadSave();
     this.initUI();
     this.bindEvents();
     requestAnimationFrame((t) => this.loop(t));
+  }
+
+  createEmptyGameState(mode = "") {
+    return {
+      mode,
+      promptText: "",
+      items: [],
+      targets: [],
+      target: null,
+      suit: WILD_KRATTS_ANIMALS.cheetah,
+      hero: {
+        emoji: "👧",
+        baseEmoji: "🧒",
+        name: "Mia",
+        hat: "👑",
+        costumeName: "Altın Taç",
+        bodyColor: "#fbbf24",
+        mood: "normal",
+        moodTimer: 0,
+        danceTimer: 0,
+        characterIdx: 0,
+        characters: [
+          { emoji: "👧", name: "Mia" },
+          { emoji: "👦", name: "Leo" },
+          { emoji: "🐱", name: "Minnoş Kedi" },
+          { emoji: "🦖", name: "Yeşil Dino" }
+        ],
+        smoothieColors: [],
+        activeTool: "soap",
+        mudSpots: [],
+        rx: 0.18,
+        ry: 0.65,
+        vy: 0,
+        onGround: true
+      },
+      extra: {
+        poppedCount: 0,
+        targetCount: 4,
+        treatEmoji: "🧁",
+        remaining: 3,
+        rescued: 0,
+        targetRescue: 5,
+        spawnTimer: 0.5,
+        scrollX: 0,
+        collected: 0,
+        targetNum: 4,
+        seq: ["🔴", "🔵", "🔴", "🔵"],
+        ans: "🔴",
+        opts: ["🔴", "🔵", "🟢"],
+        nextIdx: 0,
+        wordObj: { word: "ELMA", letters: ["E", "L", "M", "A"], emoji: "🍎" },
+        collectedIdx: 0,
+        placedCount: 0,
+        neededCount: 3,
+        toppingsOnPizza: [],
+        totalSeats: 5,
+        currentChickens: 2,
+        needed: 3,
+        paintDots: [],
+        palette: ["#ec4899", "#f59e0b", "#22c55e", "#0ea5e9", "#8b5cf6", "#fb923c"],
+        stickers: ["🦄", "🌟", "🌈", "🦖", "🍓", "🚀"],
+        balloons: []
+      }
+    };
   }
 
   // ==================== KAYIT & VERSİYON YÖNETİMİ ====================
@@ -113,22 +180,22 @@ class KidsGamesPortal {
 
       card.innerHTML = `
         <div class="kg-top">
-          <div class="kg-avatar" style="background:${g.color}28;border:2px solid ${g.color}">${g.icon}</div>
+          <div class="kg-avatar" style="background:${g.color}22;border:3px solid ${g.color}">${g.icon}</div>
           <div class="kg-meta">
             <div class="kg-badges">
-              <span class="kg-tag" style="background:${g.color};color:#0f172a">${g.badge}</span>
-              <span class="kg-tag" style="background:rgba(255,255,255,0.14);color:#fff">${g.ageTag}</span>
+              <span class="kg-tag" style="background:${g.color};color:#ffffff">${g.badge}</span>
+              <span class="kg-tag" style="background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc">${g.ageTag}</span>
             </div>
-            <h3 style="color:${g.color}">${g.title}</h3>
+            <h3 style="color:#1e293b">${g.title}</h3>
             <div class="kg-skill">✨ ${g.skill}</div>
           </div>
         </div>
         <p class="kg-desc">${g.desc}</p>
         <div class="kg-modes-preview">${modesHtml}</div>
         <div class="kg-footer">
-          <span class="kg-progress">⭐ Kazanılan Yıldız: ${earnedStars} / 90</span>
-          <button class="btn btn-primary btn-sm kg-play-btn" style="background:linear-gradient(135deg, ${g.color}, ${g.accent});color:#0f172a">
-            ▶️ OYUNU AÇ
+          <span class="kg-progress">⭐ Yıldızlar: ${earnedStars} / 90</span>
+          <button class="btn btn-primary btn-sm kg-play-btn" style="background:linear-gradient(135deg, ${g.color}, ${g.accent});color:#ffffff">
+            ▶️ HEMEN OYNA
           </button>
         </div>
       `;
@@ -161,7 +228,7 @@ class KidsGamesPortal {
     document.getElementById("gm-badge").textContent = `${g.badge} • ${g.ageTag}`;
     const titleEl = document.getElementById("gm-title");
     titleEl.textContent = g.title;
-    titleEl.style.color = g.color;
+    titleEl.style.color = "#db2777";
     document.getElementById("gm-desc").textContent = g.desc;
 
     // Mod/Oda Seçici Butonlar
@@ -171,9 +238,9 @@ class KidsGamesPortal {
       const btn = document.createElement("button");
       btn.className = `mode-select-btn ${m.id === this.activeModeId ? "active" : ""}`;
       btn.innerHTML = `
-        <span style="font-size:1.8rem">${m.icon}</span>
+        <span style="font-size:2rem">${m.icon}</span>
         <span>${m.name}</span>
-        <small style="font-size:0.72rem;color:#cbd5e1;font-weight:700">${m.desc}</small>
+        <small style="font-size:0.74rem;color:#475569;font-weight:700">${m.desc}</small>
       `;
       btn.addEventListener("click", () => {
         this.activeModeId = m.id;
@@ -193,7 +260,7 @@ class KidsGamesPortal {
       const st = starsMap[lvl] || 0;
       const cell = document.createElement("div");
       cell.className = "lvl-card";
-      cell.style.borderColor = st > 0 ? "#ffd93d" : "rgba(255,255,255,0.22)";
+      if (st > 0) cell.style.borderColor = "#f59e0b";
       cell.innerHTML = `
         <div class="lvl-num">${modeObj.icon} ${lvl}</div>
         <div class="lvl-mode-tag">${modeObj.name.replace(/^[^\s]+\s/, "")}</div>
@@ -211,9 +278,6 @@ class KidsGamesPortal {
     document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
     const target = document.getElementById(screenId);
     if (target) target.classList.add("active");
-    if (screenId === "play-screen") {
-      setTimeout(() => this.calculateGameArea(), 20);
-    }
   }
 
   /**
@@ -221,27 +285,26 @@ class KidsGamesPortal {
    * ve her yeni oyunun bileşenlerini bu alana tam sığacak şekilde ölçeklendirir.
    */
   calculateGameArea() {
-    if (!this.canvas) return;
-    const screenW = window.innerWidth;
-    const screenH = window.innerHeight;
+    if (!this.canvas || !this.ctx) return;
+    const screenW = Math.max(320, window.innerWidth || 360);
+    const screenH = Math.max(420, window.innerHeight || 640);
 
     const hudEl = document.getElementById("play-hud");
     const touchEl = document.getElementById("kids-touch-bar");
 
-    const hudH = hudEl && hudEl.offsetHeight ? hudEl.offsetHeight : 54;
-    const touchH = touchEl && touchEl.offsetHeight ? touchEl.offsetHeight : 96;
+    const hudH = hudEl && hudEl.offsetHeight ? hudEl.offsetHeight : 56;
+    const touchH = touchEl && touchEl.offsetHeight ? touchEl.offsetHeight : 100;
 
-    const availW = Math.max(290, Math.min(1100, screenW - 16));
-    const availH = Math.max(250, screenH - hudH - touchH - 14);
+    const availW = Math.max(280, Math.min(1100, screenW - 18));
+    const availH = Math.max(230, screenH - hudH - touchH - 18);
 
-    // Cihaz yatay (tablet/PC) veya dikey (telefon/dikey tablet) oranına göre ideal oyun alanı
-    const maxAspect = screenW > screenH ? 1.65 : 0.92;
+    const maxAspect = screenW > screenH ? 1.68 : 0.95;
     let gameW = availW;
     let gameH = availH;
     if (gameW / gameH > maxAspect) {
       gameW = Math.floor(gameH * maxAspect);
-    } else if (gameW / gameH < 0.56) {
-      gameH = Math.floor(gameW / 0.56);
+    } else if (gameW / gameH < 0.55) {
+      gameH = Math.floor(gameW / 0.55);
     }
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -252,9 +315,9 @@ class KidsGamesPortal {
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     const minDim = Math.min(gameW, gameH);
-    const scale = Math.max(0.62, Math.min(1.45, minDim / 460));
+    const scale = Math.max(0.62, Math.min(1.4, minDim / 450));
     const pad = Math.round(14 * scale);
-    const headerH = Math.round(64 * scale);
+    const headerH = Math.round(62 * scale);
 
     this.layout = {
       width: gameW,
@@ -265,15 +328,13 @@ class KidsGamesPortal {
       pad,
       headerH,
       playTop: headerH + pad,
-      playH: gameH - headerH - pad * 2,
+      playH: Math.max(150, gameH - headerH - pad * 2),
       fontLg: Math.round(22 * scale),
       fontMd: Math.round(16 * scale),
       fontSm: Math.round(13 * scale)
     };
 
-    if (this.state === "PLAYING") {
-      this.relayoutActiveGame();
-    }
+    this.relayoutActiveGame();
   }
 
   // ==================== OYUN BAŞLATMA VE ODA KURULUMU ====================
@@ -284,18 +345,29 @@ class KidsGamesPortal {
     const defaultMode = modes[(this.levelNum - 1) % modes.length].id;
     this.activeModeId = forcedModeId || defaultMode;
 
-    this.state = "PLAYING";
     this.stepProgress = 0;
     this.stepTarget = this.activeGameId === "tablet_tocalife" ? 5 : 4;
     this.particles = [];
     this.floatingLabels = [];
-    document.getElementById("celebration-overlay").classList.add("hidden");
+    document.getElementById("celebration-overlay")?.classList.add("hidden");
 
     this.showScreen("play-screen");
     this.renderTouchModeBar();
-    this.calculateGameArea();
+
+    // ÖNCE oyun verisini oluştur, SONRA ekran alanını hesapla ve yerleştir!
     this.setupTaskForActiveGame();
+    this.calculateGameArea();
     this.updatePlayHUD();
+    this.state = "PLAYING";
+    this.renderGame();
+
+    // Mobil Safari / iPhone ekran yerleşimi tamamlandıktan sonra yeniden ölçüm
+    setTimeout(() => {
+      if (this.state === "PLAYING") {
+        this.calculateGameArea();
+        this.renderGame();
+      }
+    }, 60);
   }
 
   renderTouchModeBar() {
@@ -313,14 +385,14 @@ class KidsGamesPortal {
         this.activeModeId = m.id;
         this.stepProgress = 0;
         this.renderTouchModeBar();
-        this.calculateGameArea();
         this.setupTaskForActiveGame();
+        this.calculateGameArea();
         this.updatePlayHUD();
+        this.renderGame();
       });
       wrap.appendChild(btn);
     });
 
-    // Hareket gerektiren modlarda büyük yön tuşlarını göster
     const needsDpad =
       this.activeGameId === "pbs_wildkratts" ||
       (this.activeGameId === "pbs_superwhy" && this.activeModeId === "wordrocket");
@@ -339,7 +411,7 @@ class KidsGamesPortal {
   }
 
   setPrompt(text, speakIt = true) {
-    this.gs.promptText = text;
+    if (this.gs) this.gs.promptText = text;
     const instrEl = document.getElementById("touch-instruction-text");
     if (instrEl) instrEl.textContent = `👆 ${text}`;
     if (speakIt) KidsAudio.speak(text);
@@ -349,15 +421,7 @@ class KidsGamesPortal {
   setupTaskForActiveGame() {
     const id = this.activeGameId;
     const mode = this.activeModeId;
-    this.gs = {
-      mode,
-      promptText: "",
-      items: [],
-      targets: [],
-      hero: {},
-      extra: {},
-      celebrateTimer: 0
-    };
+    this.gs = this.createEmptyGameState(mode);
 
     if (id === "tablet_tocalife") {
       this.setupTocaLife(mode);
@@ -385,28 +449,30 @@ class KidsGamesPortal {
         { emoji: "🐱", name: "Minnoş Kedi" },
         { emoji: "🦖", name: "Yeşil Dino" }
       ];
-      const char = characters[(this.levelNum + this.stepProgress) % characters.length];
+      const idx = (this.levelNum + this.stepProgress) % characters.length;
+      const char = characters[idx];
       this.gs.hero = {
+        ...this.gs.hero,
         emoji: char.emoji,
         name: char.name,
         mood: "normal",
         moodTimer: 0,
-        characterIdx: (this.levelNum + this.stepProgress) % characters.length,
+        characterIdx: idx,
         characters,
         smoothieColors: []
       };
-      this.gs.items = TOCA_FOODS.map((f) => ({ ...f, x: 0, y: 0, r: 30 }));
+      this.gs.items = TOCA_FOODS.map((f) => ({ ...f, x: 100, y: 200, r: 32 }));
       this.setPrompt(`${char.name} acıktı! Meyvelere, pizzaya veya dondurmaya dokunup ona yedir!`, this.stepProgress === 0);
     } else if (mode === "dressup") {
       this.gs.hero = {
+        ...this.gs.hero,
         baseEmoji: "🧒",
         hat: "👑",
         costumeName: "Altın Taç",
-        bodyColor: "#ffd93d",
-        danceTimer: 0,
-        bgThemeIdx: 0
+        bodyColor: "#f59e0b",
+        danceTimer: 0
       };
-      this.gs.items = TOCA_COSTUMES.map((c) => ({ ...c, x: 0, y: 0, r: 32 }));
+      this.gs.items = TOCA_COSTUMES.map((c) => ({ ...c, x: 100, y: 200, w: 110, h: 80 }));
       this.setPrompt("Kostüm ve şapkalara dokunarak karakterini giydir ve dans ettir!", this.stepProgress === 0);
     } else if (mode === "petcare") {
       const pets = [
@@ -416,39 +482,41 @@ class KidsGamesPortal {
       ];
       const pet = pets[(this.levelNum + this.stepProgress) % pets.length];
       this.gs.hero = {
+        ...this.gs.hero,
         emoji: pet.emoji,
         name: pet.name,
         activeTool: "soap",
         mudSpots: [
-          { dx: -0.22, dy: -0.1, cleaned: false, foam: 0 },
-          { dx: 0.2, dy: -0.08, cleaned: false, foam: 0 },
-          { dx: -0.14, dy: 0.18, cleaned: false, foam: 0 },
-          { dx: 0.16, dy: 0.16, cleaned: false, foam: 0 }
+          { dx: -0.22, dy: -0.1, cleaned: false },
+          { dx: 0.2, dy: -0.08, cleaned: false },
+          { dx: -0.14, dy: 0.18, cleaned: false },
+          { dx: 0.16, dy: 0.16, cleaned: false }
         ]
       };
       this.gs.items = [
-        { id: "soap", emoji: "🧼", name: "Köpüklü Sabun", color: "#ff5e8e" },
-        { id: "shower", emoji: "🚿", name: "Su Duşu", color: "#00f2fe" },
-        { id: "treat", emoji: "🦴", name: "Ödül Maması", color: "#ffd93d" }
+        { id: "soap", emoji: "🧼", name: "Köpüklü Sabun", color: "#ec4899", x: 100, y: 300, w: 120, h: 52 },
+        { id: "shower", emoji: "🚿", name: "Su Duşu", color: "#0ea5e9", x: 240, y: 300, w: 120, h: 52 },
+        { id: "treat", emoji: "🦴", name: "Ödül Maması", color: "#f59e0b", x: 380, y: 300, w: 120, h: 52 }
       ];
       this.setPrompt(`${pet.name} bahçede çamur olmuş! Üzerindeki lekelere dokunarak köpükle yıka!`, this.stepProgress === 0);
     } else if (mode === "artparty") {
-      this.gs.extra = {
-        paintDots: [],
-        activeColor: "#ff5e8e",
-        activeSticker: "🦄",
-        palette: ["#ff5e8e", "#ffd93d", "#2ecc71", "#00f2fe", "#a66cff", "#ff8c32"],
-        stickers: ["🦄", "🌟", "🌈", "🦖", "🍓", "🚀"],
-        balloons: []
-      };
+      const palette = ["#ec4899", "#f59e0b", "#22c55e", "#0ea5e9", "#8b5cf6", "#fb923c"];
+      const balloons = [];
       for (let i = 0; i < 6; i++) {
-        this.gs.extra.balloons.push({
+        balloons.push({
           rx: 0.16 + (i / 5) * 0.68,
-          ry: 0.35 + (i % 2) * 0.18,
-          color: this.gs.extra.palette[i % 6],
+          ry: 0.38 + (i % 2) * 0.18,
+          color: palette[i % 6],
           popped: false
         });
       }
+      this.gs.extra = {
+        ...this.gs.extra,
+        paintDots: [],
+        palette,
+        stickers: ["🦄", "🌟", "🌈", "🦖", "🍓", "🚀"],
+        balloons
+      };
       this.setPrompt("Renkli balonları patlat veya ekrana dokunarak gökkuşağı çıkartmaları yapıştır!", this.stepProgress === 0);
     }
   }
@@ -462,28 +530,32 @@ class KidsGamesPortal {
         .slice(0, 3);
       const options = [target, ...others].sort(() => Math.random() - 0.5);
       this.gs.target = target;
-      this.gs.items = options.map((o) => ({ ...o, x: 0, y: 0, w: 120, h: 110 }));
+      this.gs.items = options.map((o) => ({ ...o, x: 50, y: 150, w: 120, h: 100 }));
       this.setPrompt(target.prompt, true);
     } else if (mode === "breathe") {
-      this.gs.extra = { poppedCount: 0, targetCount: 4 };
-      const colors = ["#00f2fe", "#ff5e8e", "#ffd93d", "#2ecc71"];
+      this.gs.extra.poppedCount = 0;
+      const colors = ["#0ea5e9", "#ec4899", "#f59e0b", "#22c55e"];
       this.gs.items = [0, 1, 2, 3].map((i) => ({
         num: i + 1,
         color: colors[i],
         popped: false,
-        rx: 0.2 + i * 0.2,
-        ry: 0.58 + (i % 2) * 0.1
+        rx: 0.18 + i * 0.21,
+        ry: 0.56 + (i % 2) * 0.1,
+        x: 100 + i * 90,
+        y: 240,
+        r: 40
       }));
       this.setPrompt("Daniel ile derin bir nefes alalım! Balonlara 1, 2, 3, 4 diye dokunarak patlat!", true);
     } else if (mode === "sharing") {
       const friends = [
-        { emoji: "🐯", name: "Daniel", count: 0 },
-        { emoji: "🐱", name: "Katerina", count: 0 },
-        { emoji: "🦉", name: "Baykuş O", count: 0 }
+        { emoji: "🐯", name: "Daniel", count: 0, x: 120, y: 200, r: 45 },
+        { emoji: "🐱", name: "Katerina", count: 0, x: 260, y: 200, r: 45 },
+        { emoji: "🦉", name: "Baykuş O", count: 0, x: 400, y: 200, r: 45 }
       ];
       const treatEmoji = ["🧁", "🍓", "🍪", "🍎"][(this.levelNum + this.stepProgress) % 4];
       this.gs.targets = friends;
-      this.gs.extra = { treatEmoji, remaining: 3 };
+      this.gs.extra.treatEmoji = treatEmoji;
+      this.gs.extra.remaining = 3;
       this.setPrompt(`Arkadaşlarla paylaşmak çok güzeldir! Her arkadaşa dokunarak birer ${treatEmoji} ikram et!`, true);
     }
   }
@@ -494,43 +566,44 @@ class KidsGamesPortal {
     const info = WILD_KRATTS_ANIMALS[suitKey];
     this.gs.suit = info;
     this.gs.hero = {
+      ...this.gs.hero,
       rx: 0.18,
-      ry: suitKey === "cheetah" ? 0.72 : 0.5,
+      ry: suitKey === "cheetah" ? 0.72 : 0.52,
       vy: 0,
       onGround: true
     };
-    this.gs.extra = {
-      rescued: 0,
-      targetRescue: 5,
-      spawnTimer: 0.4,
-      scrollX: 0
-    };
-    this.gs.items = []; // babies, snacks, obstacles
-    this.setPrompt(`${info.name} aktif! Zıplayarak veya hareket ederek 5 yavru hayvanı (${info.babyEmoji}) kurtar!`, this.stepProgress === 0);
+    this.gs.extra.rescued = 0;
+    this.gs.extra.spawnTimer = 0.35;
+    this.gs.items = [];
+    this.setPrompt(`${info.name} aktif! Ekrana veya Zıpla tuşuna dokunarak yavru hayvanları (${info.babyEmoji}) kurtar!`, this.stepProgress === 0);
   }
 
   // -------------------- 4. CURIOUS GEORGE (PBS KIDS #3) --------------------
   setupCuriousGeorge(mode) {
     if (mode === "balloons") {
-      const targetNum = ((this.levelNum + this.stepProgress - 1) % 8) + 2; // 2..9
-      const palette = ["#ff5e8e", "#ffd93d", "#00f2fe", "#2ecc71", "#a66cff", "#ff8c32"];
-      this.gs.extra = { collected: 0, targetNum };
+      const targetNum = ((this.levelNum + this.stepProgress - 1) % 7) + 2; // 2..8
+      const palette = ["#ec4899", "#f59e0b", "#0ea5e9", "#22c55e", "#8b5cf6", "#fb923c"];
+      this.gs.extra.collected = 0;
+      this.gs.extra.targetNum = targetNum;
       this.gs.items = [];
       for (let i = 0; i < targetNum; i++) {
         this.gs.items.push({
           idx: i + 1,
           collected: false,
           color: palette[i % palette.length],
-          rx: 0.16 + (i % 4) * 0.22,
-          ry: 0.36 + Math.floor(i / 4) * 0.24
+          rx: 0.18 + (i % 4) * 0.21,
+          ry: 0.38 + Math.floor(i / 4) * 0.25,
+          x: 100 + (i % 4) * 90,
+          y: 220,
+          r: 36
         });
       }
       this.setPrompt(`Meraklı George'a ${targetNum} tane balon verelim! Balonlara dokunup birlikte sayalım!`, true);
     } else if (mode === "baskets") {
       const baskets = [
-        { id: "red", label: "KIRMIZI", emoji: "🍎", color: "#ef4444" },
-        { id: "yellow", label: "SARI", emoji: "🍌", color: "#facc15" },
-        { id: "green", label: "YEŞİL", emoji: "🍐", color: "#22c55e" }
+        { id: "red", label: "KIRMIZI", emoji: "🍎", color: "#ef4444", x: 120, y: 300, w: 120, h: 110 },
+        { id: "yellow", label: "SARI", emoji: "🍌", color: "#f59e0b", x: 260, y: 300, w: 120, h: 110 },
+        { id: "green", label: "YEŞİL", emoji: "🍐", color: "#22c55e", x: 400, y: 300, w: 120, h: 110 }
       ];
       const current = baskets[(this.levelNum + this.stepProgress) % baskets.length];
       this.gs.target = current;
@@ -538,14 +611,15 @@ class KidsGamesPortal {
       this.setPrompt(`${current.emoji} hangi renk sepete gitmeli? ${current.label} sepete dokun!`, true);
     } else if (mode === "train") {
       const patterns = [
-        { seq: ["🔴", "🔵", "🔴", "🔵"], ans: "🔴", opts: ["🔴", "🔵", "🟢"], name: "Kırmızı Daire" },
-        { seq: ["🍌", "🍎", "🍌", "🍎"], ans: "🍌", opts: ["🍌", "🍎", "🍇"], name: "Sarı Muz" },
-        { seq: ["⭐", "🌙", "⭐", "🌙"], ans: "⭐", opts: ["⭐", "🌙", "☀️"], name: "Parlak Yıldız" },
-        { seq: ["🟢", "🟡", "🟢", "🟡"], ans: "🟢", opts: ["🟢", "🟡", "🟣"], name: "Yeşil Top" }
+        { seq: ["🔴", "🔵", "🔴", "🔵"], ans: "🔴", opts: ["🔴", "🔵", "🟢"] },
+        { seq: ["🍌", "🍎", "🍌", "🍎"], ans: "🍌", opts: ["🍌", "🍎", "🍇"] },
+        { seq: ["⭐", "🌙", "⭐", "🌙"], ans: "⭐", opts: ["⭐", "🌙", "☀️"] },
+        { seq: ["🟢", "🟡", "🟢", "🟡"], ans: "🟢", opts: ["🟢", "🟡", "🟣"] }
       ];
       const p = patterns[(this.levelNum + this.stepProgress) % patterns.length];
-      this.gs.extra = p;
-      this.gs.items = p.opts.map((o) => ({ emoji: o }));
+      this.gs.extra.seq = p.seq;
+      this.gs.extra.ans = p.ans;
+      this.gs.items = p.opts.map((o, idx) => ({ emoji: o, x: 120 + idx * 140, y: 320, r: 40 }));
       this.setPrompt("George'un trenindeki sıraya dikkatle bak! Soru işaretli vagona hangisi gelmeli?", true);
     }
   }
@@ -559,7 +633,13 @@ class KidsGamesPortal {
         .slice(0, 3);
       const opts = [target, ...distractors].sort(() => Math.random() - 0.5);
       this.gs.target = target;
-      this.gs.items = opts.map((o) => ({ letter: o.letter, color: o.color }));
+      this.gs.items = opts.map((o, idx) => ({
+        letter: o.letter,
+        color: o.color,
+        x: 100 + idx * 110,
+        y: 300,
+        r: 40
+      }));
       this.setPrompt(`${target.word}! "${target.word}" kelimesi hangi harfle başlar? "${target.letter}" harfini bul!`, true);
     } else if (mode === "alphabridge") {
       const sets = [
@@ -570,8 +650,17 @@ class KidsGamesPortal {
         ["S", "Ş", "T", "U", "Ü"]
       ];
       const seq = sets[(this.levelNum + this.stepProgress) % sets.length];
-      this.gs.extra = { seq, nextIdx: 0 };
-      this.gs.items = seq.map((ch, idx) => ({ letter: ch, idx, done: false }));
+      this.gs.extra.seq = seq;
+      this.gs.extra.nextIdx = 0;
+      this.gs.items = seq.map((ch, idx) => ({
+        letter: ch,
+        idx,
+        done: false,
+        x: 80 + idx * 90,
+        y: 260,
+        w: 75,
+        h: 90
+      }));
       this.setPrompt(`Alpha Pig'in karşıya geçmesi için harflere sırayla dokun: Önce "${seq[0]}" harfi!`, true);
     } else if (mode === "wordrocket") {
       const words = [
@@ -582,14 +671,19 @@ class KidsGamesPortal {
         { word: "SÜT", letters: ["S", "Ü", "T"], emoji: "🥛" }
       ];
       const w = words[(this.levelNum + this.stepProgress) % words.length];
-      this.gs.extra = { wordObj: w, collectedIdx: 0 };
-      this.gs.hero = { rx: 0.18, ry: 0.55 };
+      this.gs.extra.wordObj = w;
+      this.gs.extra.collectedIdx = 0;
+      this.gs.hero.rx = 0.16;
+      this.gs.hero.ry = 0.55;
       this.gs.items = w.letters.map((ch, i) => ({
         letter: ch,
         idx: i,
         collected: false,
-        rx: 0.38 + i * 0.16,
-        ry: 0.35 + (i % 2) * 0.28
+        rx: 0.36 + i * 0.16,
+        ry: 0.38 + (i % 2) * 0.24,
+        x: 200 + i * 90,
+        y: 220,
+        r: 36
       }));
       this.setPrompt(`Süper Roketle "${w.word}" kelimesinin harflerine sırayla dokunarak topla!`, true);
     }
@@ -600,8 +694,15 @@ class KidsGamesPortal {
     if (mode === "pizza") {
       const targetShape = PEGCAT_SHAPES[(this.levelNum + this.stepProgress) % PEGCAT_SHAPES.length];
       this.gs.target = targetShape;
-      this.gs.extra = { placedCount: 0, neededCount: 3, toppingsOnPizza: [] };
-      this.gs.items = PEGCAT_SHAPES.map((s) => ({ ...s }));
+      this.gs.extra.placedCount = 0;
+      this.gs.extra.neededCount = 3;
+      this.gs.extra.toppingsOnPizza = [];
+      this.gs.items = PEGCAT_SHAPES.map((s, idx) => ({
+        ...s,
+        x: 80 + idx * 90,
+        y: 340,
+        r: 34
+      }));
       this.setPrompt(`Peg'in Pizza Dükkanı! Pizzanın üzerine 3 tane ${targetShape.name} yerleştirmek için ${targetShape.name} şekline dokun!`, true);
     } else if (mode === "sizes") {
       const themes = [
@@ -619,15 +720,23 @@ class KidsGamesPortal {
       const targetSize = askOrder[(this.levelNum + this.stepProgress) % 3];
       const shuffled = [...askOrder].sort(() => Math.random() - 0.5);
       this.gs.target = targetSize;
-      this.gs.extra = { theme: th };
-      this.gs.items = shuffled.map((s) => ({ ...s, emoji: th.emoji }));
+      this.gs.extra.theme = th;
+      this.gs.items = shuffled.map((s, idx) => ({
+        ...s,
+        emoji: th.emoji,
+        x: 120 + idx * 140,
+        y: 260,
+        r: 52
+      }));
       this.setPrompt(`Cat için ${targetSize.label} olan ${th.name} hangisi? Ona dokun!`, true);
     } else if (mode === "chickens") {
       const totalSeats = 5;
-      const startChickens = ((this.levelNum + this.stepProgress) % 3) + 1; // 1..3
+      const startChickens = ((this.levelNum + this.stepProgress) % 3) + 1;
       const needed = totalSeats - startChickens;
-      this.gs.extra = { totalSeats, currentChickens: startChickens, needed };
-      this.setPrompt(`Uzay roketinde ${totalSeats} koltuk var! ${startChickens} tavuk içeride. Roketi doldurmak için aşağıdaki tavuklara ${needed} kez dokun!`, true);
+      this.gs.extra.totalSeats = totalSeats;
+      this.gs.extra.currentChickens = startChickens;
+      this.gs.extra.needed = needed;
+      this.setPrompt(`Uzay roketinde ${totalSeats} koltuk var! ${startChickens} tavuk içeride. Roketi doldurmak için aşağıdaki tavuk butonuna ${needed} kez dokun!`, true);
     }
   }
 
@@ -636,34 +745,36 @@ class KidsGamesPortal {
    * koordinatlarını dinamik olarak yeniden boyutlandırır ve yerleştirir.
    */
   relayoutActiveGame() {
+    if (!this.gs) return;
     const { width, height, pad, playTop, playH, scale } = this.layout;
     const id = this.activeGameId;
     const mode = this.activeModeId;
-    if (!this.gs) return;
+    const items = Array.isArray(this.gs.items) ? this.gs.items : [];
+    const targets = Array.isArray(this.gs.targets) ? this.gs.targets : [];
 
     if (id === "tablet_tocalife") {
-      if (mode === "kitchen") {
+      if (mode === "kitchen" && items.length > 0) {
         const cols = 4;
         const rows = 2;
-        const areaTop = playTop + playH * 0.52;
-        const areaH = playH * 0.45;
+        const areaTop = playTop + playH * 0.5;
+        const areaH = playH * 0.48;
         const cellW = (width - pad * 2) / cols;
         const cellH = areaH / rows;
-        this.gs.items.forEach((it, idx) => {
+        items.forEach((it, idx) => {
           const c = idx % cols;
           const r = Math.floor(idx / cols);
           it.x = pad + (c + 0.5) * cellW;
           it.y = areaTop + (r + 0.5) * cellH;
-          it.r = Math.min(cellW, cellH) * 0.38;
+          it.r = Math.min(cellW, cellH) * 0.39;
         });
-      } else if (mode === "dressup") {
+      } else if (mode === "dressup" && items.length > 0) {
         const cols = 3;
         const rows = 2;
-        const areaTop = playTop + playH * 0.52;
-        const areaH = playH * 0.45;
+        const areaTop = playTop + playH * 0.5;
+        const areaH = playH * 0.48;
         const cellW = (width - pad * 2) / cols;
         const cellH = areaH / rows;
-        this.gs.items.forEach((it, idx) => {
+        items.forEach((it, idx) => {
           const c = idx % cols;
           const r = Math.floor(idx / cols);
           it.x = pad + (c + 0.5) * cellW;
@@ -671,26 +782,26 @@ class KidsGamesPortal {
           it.w = cellW * 0.88;
           it.h = cellH * 0.84;
         });
-      } else if (mode === "petcare") {
-        const count = this.gs.items.length;
+      } else if (mode === "petcare" && items.length > 0) {
+        const count = items.length;
         const cellW = (width - pad * 2) / count;
-        const btnY = height - pad - 34 * scale;
-        this.gs.items.forEach((it, idx) => {
+        const btnY = height - pad - 32 * scale;
+        items.forEach((it, idx) => {
           it.x = pad + (idx + 0.5) * cellW;
           it.y = btnY;
-          it.w = cellW * 0.88;
-          it.h = 56 * scale;
+          it.w = cellW * 0.9;
+          it.h = Math.max(44, 54 * scale);
         });
       }
     } else if (id === "pbs_daniel") {
-      if (mode === "feelings") {
+      if (mode === "feelings" && items.length > 0) {
         const cols = 2;
         const rows = 2;
-        const gridTop = playTop + playH * 0.32;
-        const gridH = playH * 0.65;
+        const gridTop = playTop + playH * 0.3;
+        const gridH = playH * 0.67;
         const cellW = (width - pad * 3) / cols;
         const cellH = (gridH - pad) / rows;
-        this.gs.items.forEach((it, idx) => {
+        items.forEach((it, idx) => {
           const c = idx % cols;
           const r = Math.floor(idx / cols);
           it.x = pad + c * (cellW + pad);
@@ -698,87 +809,87 @@ class KidsGamesPortal {
           it.w = cellW;
           it.h = cellH;
         });
-      } else if (mode === "breathe") {
-        this.gs.items.forEach((it) => {
+      } else if (mode === "breathe" && items.length > 0) {
+        items.forEach((it) => {
           it.x = it.rx * width;
           it.y = it.ry * height;
           it.r = Math.min(width, height) * 0.1;
         });
-      } else if (mode === "sharing" && this.gs.targets) {
-        const count = this.gs.targets.length;
+      } else if (mode === "sharing" && targets.length > 0) {
+        const count = targets.length;
         const cellW = (width - pad * 2) / count;
-        this.gs.targets.forEach((t, i) => {
+        targets.forEach((t, i) => {
           t.x = pad + (i + 0.5) * cellW;
           t.y = playTop + playH * 0.42;
           t.r = Math.min(cellW * 0.38, playH * 0.25);
         });
       }
     } else if (id === "pbs_george") {
-      if (mode === "balloons") {
-        this.gs.items.forEach((b) => {
+      if (mode === "balloons" && items.length > 0) {
+        items.forEach((b) => {
           b.x = b.rx * width;
           b.y = b.ry * height;
           b.r = Math.min(width, height) * 0.085;
         });
-      } else if (mode === "baskets" && this.gs.targets) {
-        const count = this.gs.targets.length;
+      } else if (mode === "baskets" && targets.length > 0) {
+        const count = targets.length;
         const cellW = (width - pad * 2) / count;
-        this.gs.targets.forEach((t, i) => {
+        targets.forEach((t, i) => {
           t.x = pad + (i + 0.5) * cellW;
-          t.y = playTop + playH * 0.72;
-          t.w = cellW * 0.86;
-          t.h = playH * 0.36;
+          t.y = playTop + playH * 0.7;
+          t.w = cellW * 0.88;
+          t.h = playH * 0.38;
         });
-      } else if (mode === "train") {
-        const count = this.gs.items.length;
+      } else if (mode === "train" && items.length > 0) {
+        const count = items.length;
         const cellW = (width - pad * 2) / count;
-        this.gs.items.forEach((it, i) => {
+        items.forEach((it, i) => {
           it.x = pad + (i + 0.5) * cellW;
-          it.y = playTop + playH * 0.75;
-          it.r = Math.min(cellW * 0.36, playH * 0.18);
+          it.y = playTop + playH * 0.74;
+          it.r = Math.min(cellW * 0.36, playH * 0.19);
         });
       }
     } else if (id === "pbs_superwhy") {
-      if (mode === "firstletter") {
-        const count = this.gs.items.length;
+      if (mode === "firstletter" && items.length > 0) {
+        const count = items.length;
         const cellW = (width - pad * 2) / count;
-        this.gs.items.forEach((it, i) => {
+        items.forEach((it, i) => {
           it.x = pad + (i + 0.5) * cellW;
           it.y = playTop + playH * 0.72;
-          it.r = Math.min(cellW * 0.38, playH * 0.2);
+          it.r = Math.min(cellW * 0.38, playH * 0.21);
         });
-      } else if (mode === "alphabridge") {
-        const count = this.gs.items.length;
+      } else if (mode === "alphabridge" && items.length > 0) {
+        const count = items.length;
         const cellW = (width - pad * 2) / count;
-        this.gs.items.forEach((it, i) => {
+        items.forEach((it, i) => {
           it.x = pad + (i + 0.5) * cellW;
-          it.y = playTop + playH * 0.55;
-          it.w = cellW * 0.85;
-          it.h = playH * 0.28;
+          it.y = playTop + playH * 0.56;
+          it.w = cellW * 0.86;
+          it.h = playH * 0.3;
         });
-      } else if (mode === "wordrocket") {
-        this.gs.items.forEach((it) => {
+      } else if (mode === "wordrocket" && items.length > 0) {
+        items.forEach((it) => {
           it.x = it.rx * width;
           it.y = it.ry * height;
-          it.r = Math.min(width, height) * 0.08;
+          it.r = Math.min(width, height) * 0.085;
         });
       }
     } else if (id === "pbs_pegcat") {
-      if (mode === "pizza") {
-        const count = this.gs.items.length;
+      if (mode === "pizza" && items.length > 0) {
+        const count = items.length;
         const cellW = (width - pad * 2) / count;
-        this.gs.items.forEach((it, i) => {
+        items.forEach((it, i) => {
           it.x = pad + (i + 0.5) * cellW;
-          it.y = playTop + playH * 0.82;
-          it.r = Math.min(cellW * 0.38, playH * 0.14);
+          it.y = playTop + playH * 0.81;
+          it.r = Math.min(cellW * 0.38, playH * 0.15);
         });
-      } else if (mode === "sizes") {
-        const count = this.gs.items.length;
+      } else if (mode === "sizes" && items.length > 0) {
+        const count = items.length;
         const cellW = (width - pad * 2) / count;
-        this.gs.items.forEach((it, i) => {
+        items.forEach((it, i) => {
           it.x = pad + (i + 0.5) * cellW;
           it.y = playTop + playH * 0.58;
-          it.r = Math.min(cellW * 0.4, playH * 0.26);
+          it.r = Math.min(cellW * 0.4, playH * 0.27);
         });
       }
     }
@@ -786,11 +897,13 @@ class KidsGamesPortal {
 
   // ==================== DOKUNMATİK / FARE ETKİLEŞİMİ ====================
   handleCanvasTap(px, py) {
-    if (this.state !== "PLAYING") return;
+    if (this.state !== "PLAYING" || !this.gs) return;
     KidsAudio.init();
     const { width, height, playTop, playH, scale } = this.layout;
     const id = this.activeGameId;
     const mode = this.activeModeId;
+    const items = Array.isArray(this.gs.items) ? this.gs.items : [];
+    const targets = Array.isArray(this.gs.targets) ? this.gs.targets : [];
 
     // Üst bilgi kutusuna dokunulursa sesli yönergeyi tekrarla
     if (py < playTop) {
@@ -801,11 +914,10 @@ class KidsGamesPortal {
 
     if (id === "tablet_tocalife") {
       if (mode === "kitchen") {
-        // Karakter değiştirme (karaktere dokunulursa)
         const charX = width * 0.5;
-        const charY = playTop + playH * 0.25;
-        if (Math.hypot(px - charX, py - charY) < 55 * scale) {
-          const h = this.gs.hero;
+        const charY = playTop + playH * 0.24;
+        const h = this.gs.hero;
+        if (h && Array.isArray(h.characters) && Math.hypot(px - charX, py - charY) < 58 * scale) {
           h.characterIdx = (h.characterIdx + 1) % h.characters.length;
           const nextC = h.characters[h.characterIdx];
           h.emoji = nextC.emoji;
@@ -814,84 +926,81 @@ class KidsGamesPortal {
           KidsAudio.speak(`Merhaba! Ben ${h.name}!`);
           return;
         }
-        for (const it of this.gs.items) {
-          if (Math.hypot(px - it.x, py - it.y) <= it.r * 1.15) {
+        for (const it of items) {
+          if (Math.hypot(px - it.x, py - it.y) <= (it.r || 32) * 1.2) {
             KidsAudio.munch();
-            this.gs.hero.mood = it.reaction;
-            this.gs.hero.moodTimer = 2.0;
-            this.gs.hero.lastFood = it.emoji;
-            this.gs.hero.smoothieColors.push(it.color);
-            if (this.gs.hero.smoothieColors.length > 4) this.gs.hero.smoothieColors.shift();
+            h.mood = it.reaction;
+            h.moodTimer = 2.0;
+            h.smoothieColors.push(it.color);
+            if (h.smoothieColors.length > 4) h.smoothieColors.shift();
             this.spawnBurst(charX, charY, it.color, 18);
-            this.addFloatingText(charX, charY - 40, `${it.emoji} ${it.name}!`, it.color);
+            this.addFloatingText(charX, charY - 36, `${it.emoji} ${it.name}!`, "#db2777");
             KidsAudio.speak(it.msg);
             this.advanceStep(false);
             return;
           }
         }
       } else if (mode === "dressup") {
-        for (const it of this.gs.items) {
-          if (Math.abs(px - it.x) <= it.w * 0.5 && Math.abs(py - it.y) <= it.h * 0.5) {
+        for (const it of items) {
+          if (Math.abs(px - it.x) <= (it.w || 100) * 0.5 && Math.abs(py - it.y) <= (it.h || 70) * 0.5) {
             KidsAudio.correct();
             this.gs.hero.hat = it.hat;
             this.gs.hero.costumeName = it.name;
             this.gs.hero.bodyColor = it.bodyColor;
             this.gs.hero.danceTimer = 2.2;
-            this.spawnBurst(width * 0.5, playTop + playH * 0.26, it.bodyColor, 20);
+            this.spawnBurst(width * 0.5, playTop + playH * 0.24, it.bodyColor, 20);
             KidsAudio.speak(`Harika! ${it.name} çok yakıştı!`);
             this.advanceStep(false);
             return;
           }
         }
       } else if (mode === "petcare") {
-        // Alt araç seçimi
-        for (const it of this.gs.items) {
-          if (Math.abs(px - it.x) <= it.w * 0.5 && Math.abs(py - it.y) <= it.h * 0.55) {
+        for (const it of items) {
+          if (Math.abs(px - it.x) <= (it.w || 100) * 0.5 && Math.abs(py - it.y) <= (it.h || 50) * 0.55) {
             this.gs.hero.activeTool = it.id;
             KidsAudio.pop();
             KidsAudio.speak(it.name);
             if (it.id === "treat") {
               KidsAudio.munch();
-              this.spawnBurst(width * 0.5, playTop + playH * 0.38, "#ffd93d", 20);
+              this.spawnBurst(width * 0.5, playTop + playH * 0.36, "#f59e0b", 20);
               this.advanceStep(false);
             }
             return;
           }
         }
-        // Hayvanın üzerindeki çamurları temizleme
         const petX = width * 0.5;
-        const petY = playTop + playH * 0.38;
-        const petR = Math.min(width, playH) * 0.26;
+        const petY = playTop + playH * 0.36;
+        const petR = Math.min(width, playH) * 0.24;
         let cleanedAny = false;
-        this.gs.hero.mudSpots.forEach((s) => {
+        const spots = Array.isArray(this.gs.hero?.mudSpots) ? this.gs.hero.mudSpots : [];
+        spots.forEach((s) => {
           const sx = petX + s.dx * petR * 1.4;
           const sy = petY + s.dy * petR * 1.4;
-          if (!s.cleaned && Math.hypot(px - sx, py - sy) < 55 * scale) {
+          if (!s.cleaned && Math.hypot(px - sx, py - sy) < 58 * scale) {
             s.cleaned = true;
             cleanedAny = true;
-            this.spawnBurst(sx, sy, "#00f2fe", 14);
+            this.spawnBurst(sx, sy, "#0ea5e9", 14);
           }
         });
         if (cleanedAny) {
           KidsAudio.pop();
-          const allClean = this.gs.hero.mudSpots.every((s) => s.cleaned);
-          if (allClean) {
+          if (spots.every((s) => s.cleaned)) {
             KidsAudio.correct();
-            KidsAudio.speak(`Tertemiz oldu! Aferin sana!`);
+            KidsAudio.speak("Tertemiz oldu! Aferin sana!");
             this.advanceStep(true);
           }
         }
       } else if (mode === "artparty") {
         const ex = this.gs.extra;
-        // Balon kontrolü
-        for (const b of ex.balloons) {
+        const balloons = Array.isArray(ex?.balloons) ? ex.balloons : [];
+        for (const b of balloons) {
           const bx = b.rx * width;
           const by = b.ry * height;
-          if (!b.popped && Math.hypot(px - bx, py - by) < 42 * scale) {
+          if (!b.popped && Math.hypot(px - bx, py - by) < 46 * scale) {
             b.popped = true;
             KidsAudio.pop();
             this.spawnBurst(bx, by, b.color, 20);
-            if (ex.balloons.every((bl) => bl.popped)) {
+            if (balloons.every((bl) => bl.popped)) {
               KidsAudio.correct();
               KidsAudio.speak("Bütün balonları patlattın! Harikasın!");
               this.advanceStep(true);
@@ -899,7 +1008,6 @@ class KidsGamesPortal {
             return;
           }
         }
-        // Çıkartma ve boya ekleme
         const color = ex.palette[ex.paintDots.length % ex.palette.length];
         const sticker = ex.stickers[ex.paintDots.length % ex.stickers.length];
         ex.paintDots.push({ x: px, y: py, color, sticker });
@@ -915,36 +1023,36 @@ class KidsGamesPortal {
     // -------------------- DANIEL TIGER --------------------
     if (id === "pbs_daniel") {
       if (mode === "feelings") {
-        for (const it of this.gs.items) {
+        for (const it of items) {
           if (px >= it.x && px <= it.x + it.w && py >= it.y && py <= it.y + it.h) {
-            if (it.id === this.gs.target.id) {
+            if (this.gs.target && it.id === this.gs.target.id) {
               KidsAudio.correct();
               this.spawnBurst(it.x + it.w / 2, it.y + it.h / 2, it.color, 22);
               KidsAudio.speak(`Evet! ${it.label} yüz! Çok doğru buldun!`);
               this.advanceStep(true);
             } else {
               KidsAudio.gentleTryAgain();
-              KidsAudio.speak(`Bu ${it.label} yüz. Tekrar bakalım, ${this.gs.target.label} yüz hangisi?`);
+              KidsAudio.speak(`Bu ${it.label} yüz. Tekrar bakalım!`);
             }
             return;
           }
         }
       } else if (mode === "breathe") {
-        const nextNum = this.gs.extra.poppedCount + 1;
-        for (const it of this.gs.items) {
-          if (!it.popped && Math.hypot(px - it.x, py - it.y) <= it.r * 1.2) {
+        const nextNum = (this.gs.extra.poppedCount || 0) + 1;
+        for (const it of items) {
+          if (!it.popped && Math.hypot(px - it.x, py - it.y) <= (it.r || 40) * 1.25) {
             if (it.num === nextNum) {
               it.popped = true;
-              this.gs.extra.poppedCount++;
+              this.gs.extra.poppedCount = nextNum;
               KidsAudio.pop();
               this.spawnBurst(it.x, it.y, it.color, 18);
               KidsAudio.speak(`${it.num}!`);
-              if (this.gs.extra.poppedCount >= 4) {
+              if (nextNum >= 4) {
                 setTimeout(() => {
                   KidsAudio.correct();
                   KidsAudio.speak("Harika nefes aldın! Şimdi çok sakin ve mutluyuz!");
                   this.advanceStep(true);
-                }, 450);
+                }, 400);
               }
             } else {
               KidsAudio.speak(`Önce ${nextNum} numaralı balona dokunalım!`);
@@ -953,15 +1061,15 @@ class KidsGamesPortal {
           }
         }
       } else if (mode === "sharing") {
-        for (const f of this.gs.targets) {
-          if (Math.hypot(px - f.x, py - f.y) <= f.r * 1.2) {
+        for (const f of targets) {
+          if (Math.hypot(px - f.x, py - f.y) <= (f.r || 45) * 1.25) {
             if (f.count === 0) {
               f.count = 1;
-              this.gs.extra.remaining--;
+              this.gs.extra.remaining = Math.max(0, (this.gs.extra.remaining || 1) - 1);
               KidsAudio.pop();
-              this.spawnBurst(f.x, f.y, "#ffd93d", 16);
+              this.spawnBurst(f.x, f.y, "#f59e0b", 16);
               KidsAudio.speak(`Teşekkürler! ${f.name} çok sevindi!`);
-              if (this.gs.targets.every((t) => t.count > 0)) {
+              if (targets.every((t) => t.count > 0)) {
                 setTimeout(() => {
                   KidsAudio.correct();
                   this.advanceStep(true);
@@ -984,10 +1092,10 @@ class KidsGamesPortal {
     // -------------------- CURIOUS GEORGE --------------------
     if (id === "pbs_george") {
       if (mode === "balloons") {
-        for (const b of this.gs.items) {
-          if (!b.collected && Math.hypot(px - b.x, py - b.y) <= b.r * 1.25) {
+        for (const b of items) {
+          if (!b.collected && Math.hypot(px - b.x, py - b.y) <= (b.r || 36) * 1.28) {
             b.collected = true;
-            this.gs.extra.collected++;
+            this.gs.extra.collected = (this.gs.extra.collected || 0) + 1;
             const cNum = this.gs.extra.collected;
             KidsAudio.pop();
             this.spawnBurst(b.x, b.y, b.color, 16);
@@ -997,32 +1105,32 @@ class KidsGamesPortal {
                 KidsAudio.correct();
                 KidsAudio.speak(`Aferin! Tam ${cNum} tane balon saydın!`);
                 this.advanceStep(true);
-              }, 450);
+              }, 400);
             }
             return;
           }
         }
       } else if (mode === "baskets") {
-        for (const b of this.gs.targets) {
-          if (Math.abs(px - b.x) <= b.w * 0.5 && Math.abs(py - b.y) <= b.h * 0.55) {
-            if (b.id === this.gs.target.id) {
+        for (const b of targets) {
+          if (Math.abs(px - b.x) <= (b.w || 110) * 0.5 && Math.abs(py - b.y) <= (b.h || 100) * 0.55) {
+            if (this.gs.target && b.id === this.gs.target.id) {
               KidsAudio.correct();
               this.spawnBurst(b.x, b.y, b.color, 22);
               KidsAudio.speak(`Harika! ${b.label} sepete koydun!`);
               this.advanceStep(true);
             } else {
               KidsAudio.gentleTryAgain();
-              KidsAudio.speak(`Bu ${b.label} sepet. ${this.gs.target.label} sepeti bulalım!`);
+              KidsAudio.speak(`Bu ${b.label} sepet. Tekrar deneyelim!`);
             }
             return;
           }
         }
       } else if (mode === "train") {
-        for (const it of this.gs.items) {
-          if (Math.hypot(px - it.x, py - it.y) <= it.r * 1.2) {
+        for (const it of items) {
+          if (Math.hypot(px - it.x, py - it.y) <= (it.r || 40) * 1.25) {
             if (it.emoji === this.gs.extra.ans) {
               KidsAudio.correct();
-              this.spawnBurst(it.x, it.y, "#ffd93d", 22);
+              this.spawnBurst(it.x, it.y, "#f59e0b", 22);
               KidsAudio.speak("Çuf çuf! Tren tamamlandı, harikasın!");
               this.advanceStep(true);
             } else {
@@ -1039,31 +1147,32 @@ class KidsGamesPortal {
     // -------------------- SUPER WHY! --------------------
     if (id === "pbs_superwhy") {
       if (mode === "firstletter") {
-        for (const it of this.gs.items) {
-          if (Math.hypot(px - it.x, py - it.y) <= it.r * 1.2) {
-            if (it.letter === this.gs.target.letter) {
+        for (const it of items) {
+          if (Math.hypot(px - it.x, py - it.y) <= (it.r || 40) * 1.25) {
+            if (this.gs.target && it.letter === this.gs.target.letter) {
               KidsAudio.correct();
               this.spawnBurst(it.x, it.y, it.color, 24);
               KidsAudio.speak(`Süpersin! ${this.gs.target.letter} harfi! ${this.gs.target.word}!`);
               this.advanceStep(true);
             } else {
               KidsAudio.gentleTryAgain();
-              KidsAudio.speak(`Bu ${it.letter} harfi. Biz "${this.gs.target.letter}" harfini arıyoruz!`);
+              KidsAudio.speak(`Bu ${it.letter} harfi. Tekrar bakalım!`);
             }
             return;
           }
         }
       } else if (mode === "alphabridge") {
-        const expected = this.gs.extra.seq[this.gs.extra.nextIdx];
-        for (const it of this.gs.items) {
-          if (!it.done && Math.abs(px - it.x) <= it.w * 0.5 && Math.abs(py - it.y) <= it.h * 0.55) {
+        const seq = this.gs.extra.seq || [];
+        const expected = seq[this.gs.extra.nextIdx || 0];
+        for (const it of items) {
+          if (!it.done && Math.abs(px - it.x) <= (it.w || 70) * 0.5 && Math.abs(py - it.y) <= (it.h || 80) * 0.55) {
             if (it.letter === expected) {
               it.done = true;
               this.gs.extra.nextIdx++;
               KidsAudio.pop();
-              this.spawnBurst(it.x, it.y, "#00f2fe", 18);
+              this.spawnBurst(it.x, it.y, "#0ea5e9", 18);
               KidsAudio.speak(it.letter);
-              if (this.gs.extra.nextIdx >= this.gs.extra.seq.length) {
+              if (this.gs.extra.nextIdx >= seq.length) {
                 setTimeout(() => {
                   KidsAudio.correct();
                   KidsAudio.speak("Harf köprüsü tamamlandı! Alpha Pig karşıya geçti!");
@@ -1077,23 +1186,22 @@ class KidsGamesPortal {
           }
         }
       } else if (mode === "wordrocket") {
-        // Dokunulan yere roketi uçur ve harfi kontrol et
-        this.gs.hero.ry = Math.max(0.22, Math.min(0.84, py / height));
-        const nextIdx = this.gs.extra.collectedIdx;
-        for (const it of this.gs.items) {
-          if (!it.collected && Math.hypot(px - it.x, py - it.y) <= it.r * 1.35) {
+        this.gs.hero.ry = Math.max(0.24, Math.min(0.84, py / height));
+        const nextIdx = this.gs.extra.collectedIdx || 0;
+        for (const it of items) {
+          if (!it.collected && Math.hypot(px - it.x, py - it.y) <= (it.r || 36) * 1.35) {
             if (it.idx === nextIdx) {
               it.collected = true;
-              this.gs.extra.collectedIdx++;
+              this.gs.extra.collectedIdx = nextIdx + 1;
               KidsAudio.pop();
-              this.spawnBurst(it.x, it.y, "#ffd93d", 18);
+              this.spawnBurst(it.x, it.y, "#f59e0b", 18);
               KidsAudio.speak(it.letter);
-              if (this.gs.extra.collectedIdx >= this.gs.items.length) {
+              if (this.gs.extra.collectedIdx >= items.length) {
                 setTimeout(() => {
                   KidsAudio.correct();
                   KidsAudio.speak(`Tebrikler! ${this.gs.extra.wordObj.word} kelimesini yazdın!`);
                   this.advanceStep(true);
-                }, 450);
+                }, 400);
               }
             } else {
               const expCh = this.gs.extra.wordObj.letters[nextIdx];
@@ -1109,9 +1217,9 @@ class KidsGamesPortal {
     // -------------------- PEG + CAT --------------------
     if (id === "pbs_pegcat") {
       if (mode === "pizza") {
-        for (const it of this.gs.items) {
-          if (Math.hypot(px - it.x, py - it.y) <= it.r * 1.25) {
-            if (it.id === this.gs.target.id) {
+        for (const it of items) {
+          if (Math.hypot(px - it.x, py - it.y) <= (it.r || 34) * 1.25) {
+            if (this.gs.target && it.id === this.gs.target.id) {
               this.gs.extra.placedCount++;
               const angle = (this.gs.extra.placedCount / 3) * Math.PI * 2;
               this.gs.extra.toppingsOnPizza.push({
@@ -1121,12 +1229,12 @@ class KidsGamesPortal {
                 dy: Math.sin(angle) * 0.42
               });
               KidsAudio.pop();
-              this.spawnBurst(width * 0.5, playTop + playH * 0.38, it.color, 18);
+              this.spawnBurst(width * 0.5, playTop + playH * 0.36, it.color, 18);
               KidsAudio.speak(`${this.gs.extra.placedCount} ${it.name}!`);
               if (this.gs.extra.placedCount >= this.gs.extra.neededCount) {
                 setTimeout(() => {
                   KidsAudio.correct();
-                  KidsAudio.speak(`Harika! Şekilli pizza hazır!`);
+                  KidsAudio.speak("Harika! Şekilli pizza hazır!");
                   this.advanceStep(true);
                 }, 400);
               }
@@ -1138,33 +1246,33 @@ class KidsGamesPortal {
           }
         }
       } else if (mode === "sizes") {
-        for (const it of this.gs.items) {
-          if (Math.hypot(px - it.x, py - it.y) <= it.r * 1.15) {
-            if (it.id === this.gs.target.id) {
+        for (const it of items) {
+          if (Math.hypot(px - it.x, py - it.y) <= (it.r || 48) * 1.2) {
+            if (this.gs.target && it.id === this.gs.target.id) {
               KidsAudio.correct();
-              this.spawnBurst(it.x, it.y, "#2ecc71", 22);
+              this.spawnBurst(it.x, it.y, "#22c55e", 22);
               KidsAudio.speak(`Evet! ${it.label} olanı buldun!`);
               this.advanceStep(true);
             } else {
               KidsAudio.gentleTryAgain();
-              KidsAudio.speak(`Bu ${it.label}. Biz ${this.gs.target.label} olanı arıyoruz!`);
+              KidsAudio.speak(`Bu ${it.label}. Tekrar bakalım!`);
             }
             return;
           }
         }
       } else if (mode === "chickens") {
         const ex = this.gs.extra;
-        if (py > playTop + playH * 0.5 && ex.currentChickens < ex.totalSeats) {
+        if (py > playTop + playH * 0.48 && ex.currentChickens < ex.totalSeats) {
           ex.currentChickens++;
           KidsAudio.pop();
-          this.spawnBurst(width * 0.5, playTop + playH * 0.35, "#ffd93d", 16);
+          this.spawnBurst(width * 0.5, playTop + playH * 0.34, "#f59e0b", 16);
           KidsAudio.speak(`${ex.currentChickens}!`);
           if (ex.currentChickens >= ex.totalSeats) {
             setTimeout(() => {
               KidsAudio.correct();
               KidsAudio.speak("5, 4, 3, 2, 1, Fırlat! Tüm uzay tavukları rokete bindi!");
               this.advanceStep(true);
-            }, 450);
+            }, 400);
           }
         }
       }
@@ -1172,9 +1280,8 @@ class KidsGamesPortal {
   }
 
   triggerHeroJumpOrMove(px, py) {
-    if (this.activeGameId !== "pbs_wildkratts") return;
+    if (this.activeGameId !== "pbs_wildkratts" || !this.gs?.hero) return;
     const h = this.gs.hero;
-    if (!h) return;
     KidsAudio.pop();
     if (this.activeModeId === "cheetah") {
       if (h.onGround) {
@@ -1204,7 +1311,7 @@ class KidsGamesPortal {
         if (this.state === "PLAYING") {
           this.setupTaskForActiveGame();
         }
-      }, 650);
+      }, 600);
     }
   }
 
@@ -1217,7 +1324,6 @@ class KidsGamesPortal {
     this.save.starsByGame[gId][this.levelNum] = 3;
     this.save.totalStars = (this.save.totalStars || 0) + 3;
 
-    // Yeni çıkartma ödülü aç
     const lockedStickers = STICKER_COLLECTION.filter(
       (s) => !(this.save.unlockedStickers || []).includes(s.id)
     );
@@ -1234,7 +1340,7 @@ class KidsGamesPortal {
     document.getElementById("cel-subtitle").textContent = `${this.gameMeta.title} - Aşama ${this.levelNum}`;
 
     const factBox = document.getElementById("cel-fact-box");
-    if (this.activeGameId === "pbs_wildkratts" && this.gs.suit) {
+    if (this.activeGameId === "pbs_wildkratts" && this.gs?.suit) {
       factBox.textContent = `🐾 ${this.gs.suit.fact}`;
     } else {
       factBox.textContent = `✨ Harika iş çıkardın! +3 Altın Yıldız kazandın!`;
@@ -1249,26 +1355,29 @@ class KidsGamesPortal {
     }
 
     document.getElementById("celebration-overlay").classList.remove("hidden");
-    KidsAudio.speak(`Harikasın! Aşamayı başarıyla tamamladın ve üç yıldız kazandın!`);
+    KidsAudio.speak("Harikasın! Aşamayı başarıyla tamamladın ve üç yıldız kazandın!");
   }
 
   // ==================== OYUN DÖNGÜSÜ VE ÇİZİM (RENDER) ====================
   loop(now) {
-    const dt = Math.min(0.05, (now - this.lastFrame) / 1000);
+    requestAnimationFrame((t) => this.loop(t));
+    const dt = Math.min(0.05, Math.max(0.001, (now - this.lastFrame) / 1000));
     this.lastFrame = now;
     this.animTime += dt;
 
     if (this.state === "PLAYING" && this.ctx) {
-      this.updateGame(dt);
-      this.renderGame();
+      try {
+        this.updateGame(dt);
+        this.renderGame();
+      } catch (err) {
+        console.error("Render warning:", err);
+      }
     }
-    requestAnimationFrame((t) => this.loop(t));
   }
 
   updateGame(dt) {
     if (this.hintTimer > 0) this.hintTimer = Math.max(0, this.hintTimer - dt);
 
-    // Parçacık efektleri
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
       p.x += p.vx * dt;
@@ -1285,20 +1394,20 @@ class KidsGamesPortal {
       if (f.life <= 0) this.floatingLabels.splice(i, 1);
     }
 
-    if (this.gs.hero && this.gs.hero.moodTimer > 0) {
-      this.gs.hero.moodTimer = Math.max(0, this.gs.hero.moodTimer - dt);
-      if (this.gs.hero.moodTimer === 0) this.gs.hero.mood = "normal";
+    const h = this.gs?.hero;
+    if (h && h.moodTimer > 0) {
+      h.moodTimer = Math.max(0, h.moodTimer - dt);
+      if (h.moodTimer === 0) h.mood = "normal";
     }
-    if (this.gs.hero && this.gs.hero.danceTimer > 0) {
-      this.gs.hero.danceTimer = Math.max(0, this.gs.hero.danceTimer - dt);
+    if (h && h.danceTimer > 0) {
+      h.danceTimer = Math.max(0, h.danceTimer - dt);
     }
 
     // Wild Kratts gerçek zamanlı hareket güncellemesi
-    if (this.activeGameId === "pbs_wildkratts") {
-      const h = this.gs.hero;
+    if (this.activeGameId === "pbs_wildkratts" && h && this.gs?.extra) {
       const ex = this.gs.extra;
-      if (!h || !ex) return;
-      ex.scrollX += dt * 160;
+      const suit = this.gs.suit || WILD_KRATTS_ANIMALS.cheetah;
+      ex.scrollX += dt * 150;
 
       if (this.activeModeId === "cheetah") {
         if (!h.onGround) {
@@ -1318,20 +1427,20 @@ class KidsGamesPortal {
         const isBaby = Math.random() < 0.72;
         this.gs.items.push({
           kind: isBaby ? "baby" : "obs",
-          emoji: isBaby ? this.gs.suit.babyEmoji : this.gs.suit.obsEmoji,
+          emoji: isBaby ? suit.babyEmoji : suit.obsEmoji,
           rx: 1.06,
-          ry: this.activeModeId === "cheetah" ? (isBaby ? 0.56 : 0.73) : 0.28 + Math.random() * 0.5
+          ry: this.activeModeId === "cheetah" ? (isBaby ? 0.56 : 0.73) : 0.3 + Math.random() * 0.48
         });
       }
 
       for (let i = this.gs.items.length - 1; i >= 0; i--) {
         const it = this.gs.items[i];
-        it.rx -= dt * 0.36;
+        it.rx -= dt * 0.35;
         const dist = Math.hypot((it.rx - h.rx) * this.layout.width, (it.ry - h.ry) * this.layout.height);
-        if (dist < 46 * this.layout.scale) {
+        if (dist < 48 * this.layout.scale) {
           if (it.kind === "baby") {
             KidsAudio.correct();
-            this.spawnBurst(it.rx * this.layout.width, it.ry * this.layout.height, "#2ecc71", 18);
+            this.spawnBurst(it.rx * this.layout.width, it.ry * this.layout.height, "#22c55e", 18);
             this.gs.items.splice(i, 1);
             this.advanceStep(false);
             return;
@@ -1347,28 +1456,37 @@ class KidsGamesPortal {
 
   renderGame() {
     const ctx = this.ctx;
-    const { width, height, pad, headerH, playTop, playH, scale, fontLg, fontMd } = this.layout;
+    if (!ctx || !this.gs) return;
+    const { width, height, pad, headerH, scale, fontLg } = this.layout;
     ctx.clearRect(0, 0, width, height);
 
-    // Arka plan renk geçişi
-    const grad = ctx.createLinearGradient(0, 0, 0, height);
-    grad.addColorStop(0, "#1e295b");
-    grad.addColorStop(1, "#0f172a");
-    ctx.fillStyle = grad;
+    // Sevimli Gündüz Gökyüzü + Yeşil Çimenlik Arka Planı
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+    skyGrad.addColorStop(0, "#bae6fd");
+    skyGrad.addColorStop(0.62, "#fef9c3");
+    skyGrad.addColorStop(1, "#bbf7d0");
+    ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, width, height);
 
-    // Üst Yönerge Banner'ı (Dokununca sesli okur)
-    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-    ctx.strokeStyle = this.gameMeta ? this.gameMeta.color : "#ffd93d";
-    ctx.lineWidth = 2.5;
-    this.roundRect(ctx, pad, pad * 0.6, width - pad * 2, headerH - pad * 0.4, 16, true, true);
+    // Sevimli güneş ve bulutlar
+    ctx.font = `${Math.round(32 * scale)}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("☀️", width - 38 * scale, headerH + 26 * scale);
+    ctx.fillText("☁️", 42 * scale, headerH + 24 * scale);
 
+    // Üst Yönerge Kutusu (Parlak Beyaz & Sarı Çerçeveli)
     ctx.fillStyle = "#ffffff";
-    ctx.font = `800 ${Math.max(12, Math.round(14 * scale))}px 'Segoe UI', sans-serif`;
+    ctx.strokeStyle = this.gameMeta ? this.gameMeta.color : "#f59e0b";
+    ctx.lineWidth = 3;
+    this.roundRect(ctx, pad, pad * 0.55, width - pad * 2, headerH - pad * 0.35, 16, true, true);
+
+    ctx.fillStyle = "#1e293b";
+    ctx.font = `900 ${Math.max(12, Math.round(14 * scale))}px 'Nunito', 'Segoe UI', sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const promptStr = `🗣️ ${this.gs.promptText || ""}`;
-    this.drawWrappedText(ctx, promptStr, width / 2, pad * 0.6 + (headerH - pad * 0.4) / 2, width - pad * 4, Math.round(17 * scale));
+    this.drawWrappedText(ctx, promptStr, width / 2, pad * 0.55 + (headerH - pad * 0.35) / 2, width - pad * 4, Math.round(17 * scale));
 
     // Aktif oyunun sahnesini çiz
     const id = this.activeGameId;
@@ -1405,29 +1523,29 @@ class KidsGamesPortal {
   renderTocaLife(ctx) {
     const { width, height, playTop, playH, scale } = this.layout;
     const mode = this.activeModeId;
+    const h = this.gs?.hero || {};
+    const items = Array.isArray(this.gs?.items) ? this.gs.items : [];
 
     if (mode === "kitchen") {
-      const h = this.gs.hero;
       const cx = width * 0.5;
-      const cy = playTop + playH * 0.25;
+      const cy = playTop + playH * 0.24;
       const r = Math.min(width, playH) * 0.17;
 
-      // Mutfak Masası & Karakter
-      ctx.fillStyle = "rgba(255, 94, 142, 0.2)";
-      ctx.strokeStyle = "#ff5e8e";
-      ctx.lineWidth = 3;
+      // Mutfak Karakter Dairesi
+      ctx.fillStyle = "#fff1f2";
+      ctx.strokeStyle = "#ec4899";
+      ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
-      const bounce = h.moodTimer > 0 ? Math.sin(this.animTime * 14) * 6 : 0;
+      const bounce = (h.moodTimer || 0) > 0 ? Math.sin(this.animTime * 14) * 6 : 0;
       ctx.font = `${Math.round(r * 1.15)}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(h.emoji, cx, cy + bounce);
+      ctx.fillText(h.emoji || "👧", cx, cy + bounce);
 
-      // Duygu tepkisi
       const moodBadge = h.mood === "love" ? "😍😋" : h.mood === "excited" ? "🤩🎉" : h.mood === "sour" ? "😖🍋" : h.mood === "strong" ? "💪😄" : "😋";
       ctx.font = `${Math.round(26 * scale)}px sans-serif`;
       ctx.fillText(moodBadge, cx + r * 0.85, cy - r * 0.65);
@@ -1435,71 +1553,73 @@ class KidsGamesPortal {
       // Smoothie Bardağı
       const cupX = width * 0.82;
       const cupY = cy;
-      ctx.fillStyle = "rgba(255,255,255,0.2)";
-      this.roundRect(ctx, cupX - 24 * scale, cupY - 34 * scale, 48 * scale, 68 * scale, 10, true, true);
-      h.smoothieColors.forEach((col, idx) => {
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 3;
+      this.roundRect(ctx, cupX - 24 * scale, cupY - 34 * scale, 48 * scale, 68 * scale, 12, true, true);
+      (h.smoothieColors || []).forEach((col, idx) => {
         ctx.fillStyle = col;
         ctx.fillRect(cupX - 20 * scale, cupY + (18 - idx * 14) * scale, 40 * scale, 13 * scale);
       });
 
-      // Yiyecek tepsisi
-      for (const it of this.gs.items) {
-        ctx.fillStyle = `${it.color}33`;
-        ctx.strokeStyle = it.color;
-        ctx.lineWidth = 2.5;
+      // Yiyecek Kartları
+      for (const it of items) {
+        const ir = it.r || 32;
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = it.color || "#f59e0b";
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+        ctx.arc(it.x, it.y, ir, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = `${Math.round(it.r * 0.95)}px sans-serif`;
-        ctx.fillText(it.emoji, it.x, it.y - 4 * scale);
-        ctx.fillStyle = "#ffffff";
-        ctx.font = `800 ${Math.round(11 * scale)}px sans-serif`;
-        ctx.fillText(it.name, it.x, it.y + it.r * 0.72);
+        ctx.font = `${Math.round(ir * 0.95)}px sans-serif`;
+        ctx.fillText(it.emoji, it.x, it.y - 5 * scale);
+        ctx.fillStyle = "#1e293b";
+        ctx.font = `900 ${Math.round(11 * scale)}px sans-serif`;
+        ctx.fillText(it.name, it.x, it.y + ir * 0.72);
       }
     } else if (mode === "dressup") {
-      const h = this.gs.hero;
       const cx = width * 0.5;
-      const cy = playTop + playH * 0.25;
-      const danceX = h.danceTimer > 0 ? Math.sin(this.animTime * 12) * 14 : 0;
+      const cy = playTop + playH * 0.24;
+      const danceX = (h.danceTimer || 0) > 0 ? Math.sin(this.animTime * 12) * 14 : 0;
 
-      // Podyum halkası
-      ctx.fillStyle = `${h.bodyColor}33`;
-      ctx.strokeStyle = h.bodyColor;
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = h.bodyColor || "#f59e0b";
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.arc(cx + danceX, cy, Math.min(width, playH) * 0.17, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
-      ctx.font = `${Math.round(56 * scale)}px sans-serif`;
+      ctx.font = `${Math.round(54 * scale)}px sans-serif`;
       ctx.textAlign = "center";
-      ctx.fillText(h.baseEmoji, cx + danceX, cy + 10 * scale);
-      ctx.font = `${Math.round(40 * scale)}px sans-serif`;
-      ctx.fillText(h.hat, cx + danceX, cy - 34 * scale);
+      ctx.textBaseline = "middle";
+      ctx.fillText(h.baseEmoji || "🧒", cx + danceX, cy + 10 * scale);
+      ctx.font = `${Math.round(38 * scale)}px sans-serif`;
+      ctx.fillText(h.hat || "👑", cx + danceX, cy - 32 * scale);
 
-      for (const it of this.gs.items) {
-        ctx.fillStyle = `${it.bodyColor}28`;
-        ctx.strokeStyle = it.bodyColor;
-        ctx.lineWidth = 2.5;
-        this.roundRect(ctx, it.x - it.w / 2, it.y - it.h / 2, it.w, it.h, 14, true, true);
+      for (const it of items) {
+        const iw = it.w || 100;
+        const ih = it.h || 70;
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = it.bodyColor || "#ec4899";
+        ctx.lineWidth = 3;
+        this.roundRect(ctx, it.x - iw / 2, it.y - ih / 2, iw, ih, 16, true, true);
         ctx.font = `${Math.round(28 * scale)}px sans-serif`;
         ctx.fillText(it.emoji, it.x, it.y - 8 * scale);
-        ctx.fillStyle = "#fff";
-        ctx.font = `800 ${Math.round(12 * scale)}px sans-serif`;
-        ctx.fillText(it.name, it.x, it.y + it.h * 0.3);
+        ctx.fillStyle = "#1e293b";
+        ctx.font = `900 ${Math.round(12 * scale)}px sans-serif`;
+        ctx.fillText(it.name, it.x, it.y + ih * 0.3);
       }
     } else if (mode === "petcare") {
-      const h = this.gs.hero;
       const cx = width * 0.5;
-      const cy = playTop + playH * 0.38;
+      const cy = playTop + playH * 0.36;
       const petR = Math.min(width, playH) * 0.23;
 
-      // Banyo küveti dairesi
-      ctx.fillStyle = "rgba(0, 242, 254, 0.18)";
-      ctx.strokeStyle = "#00f2fe";
-      ctx.lineWidth = 3;
+      ctx.fillStyle = "#e0f2fe";
+      ctx.strokeStyle = "#0ea5e9";
+      ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.arc(cx, cy, petR, 0, Math.PI * 2);
       ctx.fill();
@@ -1508,16 +1628,15 @@ class KidsGamesPortal {
       ctx.font = `${Math.round(petR * 1.15)}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(h.emoji, cx, cy);
+      ctx.fillText(h.emoji || "🐶", cx, cy);
 
-      // Çamur lekeleri veya köpükler
-      h.mudSpots.forEach((s) => {
+      (h.mudSpots || []).forEach((s) => {
         const sx = cx + s.dx * petR * 1.4;
         const sy = cy + s.dy * petR * 1.4;
         if (!s.cleaned) {
-          ctx.fillStyle = "#78350f";
-          ctx.strokeStyle = "#ffd93d";
-          ctx.lineWidth = 2;
+          ctx.fillStyle = "#b45309";
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2.5;
           ctx.beginPath();
           ctx.arc(sx, sy, 22 * scale, 0, Math.PI * 2);
           ctx.fill();
@@ -1530,20 +1649,21 @@ class KidsGamesPortal {
         }
       });
 
-      // Alt bakım araçları
-      for (const it of this.gs.items) {
+      for (const it of items) {
+        const iw = it.w || 110;
+        const ih = it.h || 50;
         const active = h.activeTool === it.id;
-        ctx.fillStyle = active ? `${it.color}55` : "rgba(255,255,255,0.12)";
-        ctx.strokeStyle = it.color;
-        ctx.lineWidth = active ? 3.5 : 2;
-        this.roundRect(ctx, it.x - it.w / 2, it.y - it.h / 2, it.w, it.h, 14, true, true);
-        ctx.fillStyle = "#fff";
-        ctx.font = `800 ${Math.round(14 * scale)}px sans-serif`;
+        ctx.fillStyle = active ? "#fef9c3" : "#ffffff";
+        ctx.strokeStyle = it.color || "#0ea5e9";
+        ctx.lineWidth = active ? 4 : 2.5;
+        this.roundRect(ctx, it.x - iw / 2, it.y - ih / 2, iw, ih, 16, true, true);
+        ctx.fillStyle = "#1e293b";
+        ctx.font = `900 ${Math.round(13 * scale)}px sans-serif`;
         ctx.fillText(`${it.emoji} ${it.name}`, it.x, it.y);
       }
     } else if (mode === "artparty") {
-      const ex = this.gs.extra;
-      for (const d of ex.paintDots) {
+      const ex = this.gs.extra || {};
+      for (const d of ex.paintDots || []) {
         ctx.fillStyle = d.color;
         ctx.beginPath();
         ctx.arc(d.x, d.y, 24 * scale, 0, Math.PI * 2);
@@ -1552,16 +1672,18 @@ class KidsGamesPortal {
         ctx.textAlign = "center";
         ctx.fillText(d.sticker, d.x, d.y + 4);
       }
-      for (const b of ex.balloons) {
+      for (const b of ex.balloons || []) {
         if (b.popped) continue;
         const bx = b.rx * width;
         const by = b.ry * height + Math.sin(this.animTime * 3 + b.rx * 10) * 8;
         ctx.fillStyle = b.color;
         ctx.beginPath();
-        ctx.arc(bx, by, 32 * scale, 0, Math.PI * 2);
+        ctx.arc(bx, by, 34 * scale, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = `${Math.round(22 * scale)}px sans-serif`;
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.font = `${Math.round(24 * scale)}px sans-serif`;
         ctx.textAlign = "center";
         ctx.fillText("🎈", bx, by);
       }
@@ -1572,117 +1694,128 @@ class KidsGamesPortal {
   renderDanielTiger(ctx) {
     const { width, playTop, playH, scale } = this.layout;
     const mode = this.activeModeId;
+    const items = Array.isArray(this.gs?.items) ? this.gs.items : [];
+    const targets = Array.isArray(this.gs?.targets) ? this.gs.targets : [];
 
     if (mode === "feelings") {
       const cx = width * 0.5;
-      const cy = playTop + playH * 0.15;
+      const cy = playTop + playH * 0.14;
       ctx.font = `${Math.round(46 * scale)}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(`🐯 ${this.gs.target ? this.gs.target.emoji : "😊"}`, cx, cy);
 
-      for (const it of this.gs.items) {
+      for (const it of items) {
         const isHint = this.hintTimer > 0 && this.gs.target && it.id === this.gs.target.id;
-        ctx.fillStyle = `${it.color}30`;
-        ctx.strokeStyle = isHint ? "#ffffff" : it.color;
-        ctx.lineWidth = isHint ? 5 : 3;
-        this.roundRect(ctx, it.x, it.y, it.w, it.h, 18, true, true);
+        ctx.fillStyle = isHint ? "#fef9c3" : "#ffffff";
+        ctx.strokeStyle = it.color || "#fb923c";
+        ctx.lineWidth = isHint ? 5 : 3.5;
+        this.roundRect(ctx, it.x, it.y, it.w, it.h, 20, true, true);
 
         ctx.font = `${Math.round(it.h * 0.46)}px sans-serif`;
-        ctx.fillText(it.emoji, it.x + it.w / 2, it.y + it.h * 0.4);
-        ctx.fillStyle = "#ffffff";
+        ctx.fillText(it.emoji, it.x + it.w / 2, it.y + it.h * 0.42);
+        ctx.fillStyle = "#1e293b";
         ctx.font = `900 ${Math.round(15 * scale)}px sans-serif`;
-        ctx.fillText(it.label, it.x + it.w / 2, it.y + it.h * 0.8);
+        ctx.fillText(it.label, it.x + it.w / 2, it.y + it.h * 0.82);
       }
     } else if (mode === "breathe") {
       ctx.font = `${Math.round(52 * scale)}px sans-serif`;
       ctx.textAlign = "center";
       ctx.fillText("🐯 🌈", width * 0.5, playTop + playH * 0.2);
 
-      for (const it of this.gs.items) {
+      for (const it of items) {
         if (it.popped) continue;
         const floatY = it.y + Math.sin(this.animTime * 3 + it.num) * 8;
-        ctx.fillStyle = `${it.color}44`;
-        ctx.strokeStyle = it.color;
-        ctx.lineWidth = 3.5;
+        ctx.fillStyle = it.color;
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.arc(it.x, floatY, it.r, 0, Math.PI * 2);
+        ctx.arc(it.x, floatY, it.r || 40, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = "#fff";
-        ctx.font = `900 ${Math.round(it.r * 0.85)}px sans-serif`;
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `900 ${Math.round((it.r || 40) * 0.85)}px sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(it.num, it.x, floatY);
       }
     } else if (mode === "sharing") {
-      const treat = this.gs.extra.treatEmoji;
-      for (const f of this.gs.targets) {
-        ctx.fillStyle = f.count > 0 ? "rgba(46, 204, 113, 0.28)" : "rgba(255, 255, 255, 0.12)";
-        ctx.strokeStyle = f.count > 0 ? "#2ecc71" : "#ffd93d";
-        ctx.lineWidth = 3;
+      const treat = this.gs.extra?.treatEmoji || "🧁";
+      for (const f of targets) {
+        const fr = f.r || 45;
+        ctx.fillStyle = f.count > 0 ? "#dcfce7" : "#ffffff";
+        ctx.strokeStyle = f.count > 0 ? "#22c55e" : "#f59e0b";
+        ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.arc(f.x, f.y, fr, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = `${Math.round(f.r * 0.9)}px sans-serif`;
+        ctx.font = `${Math.round(fr * 0.9)}px sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(f.emoji, f.x, f.y - 6 * scale);
-        ctx.fillStyle = "#fff";
-        ctx.font = `800 ${Math.round(13 * scale)}px sans-serif`;
-        ctx.fillText(f.name, f.x, f.y + f.r * 0.72);
+        ctx.fillStyle = "#1e293b";
+        ctx.font = `900 ${Math.round(13 * scale)}px sans-serif`;
+        ctx.fillText(f.name, f.x, f.y + fr * 0.72);
 
         if (f.count > 0) {
-          ctx.font = `${Math.round(30 * scale)}px sans-serif`;
-          ctx.fillText(treat, f.x, f.y + f.r * 1.25);
+          ctx.font = `${Math.round(32 * scale)}px sans-serif`;
+          ctx.fillText(treat, f.x, f.y + fr * 1.25);
         }
       }
-      ctx.font = `800 ${Math.round(18 * scale)}px sans-serif`;
-      ctx.fillStyle = "#ffd93d";
-      ctx.fillText(`Tepsideki İkramlar: ${treat.repeat(Math.max(0, this.gs.extra.remaining))}`, width * 0.5, playTop + playH * 0.86);
+      ctx.font = `900 ${Math.round(18 * scale)}px sans-serif`;
+      ctx.fillStyle = "#b45309";
+      ctx.fillText(`Tepsideki İkramlar: ${treat.repeat(Math.max(0, this.gs.extra?.remaining || 0))}`, width * 0.5, playTop + playH * 0.86);
     }
   }
 
   // -------------------- RENDER: WILD KRATTS --------------------
   renderWildKratts(ctx) {
-    const { width, height, playTop, playH, scale } = this.layout;
-    const suit = this.gs.suit;
-    const h = this.gs.hero;
-    if (!suit || !h) return;
+    const { width, height, playTop, scale } = this.layout;
+    const suit = this.gs?.suit || WILD_KRATTS_ANIMALS.cheetah;
+    const h = this.gs?.hero || { rx: 0.18, ry: 0.72 };
+    const items = Array.isArray(this.gs?.items) ? this.gs.items : [];
 
-    // Doğa arka planı
+    // Doğa arka planı (Aydınlık ve sevimli)
     const bg = ctx.createLinearGradient(0, playTop, 0, height);
-    bg.addColorStop(0, suit.bgTop);
-    bg.addColorStop(1, suit.bgBot);
+    if (this.activeModeId === "dolphin") {
+      bg.addColorStop(0, "#7dd3fc");
+      bg.addColorStop(1, "#0284c7");
+    } else if (this.activeModeId === "eagle") {
+      bg.addColorStop(0, "#bae6fd");
+      bg.addColorStop(1, "#fef9c3");
+    } else {
+      bg.addColorStop(0, "#fef08a");
+      bg.addColorStop(1, "#bbf7d0");
+    }
     ctx.fillStyle = bg;
     ctx.fillRect(0, playTop, width, height - playTop);
 
-    // Zemin çizgisi
     if (this.activeModeId === "cheetah") {
-      ctx.fillStyle = "#3f6212";
+      ctx.fillStyle = "#4ade80";
       ctx.fillRect(0, height * 0.79, width, height * 0.21);
     }
 
-    // Kahraman
     const hx = h.rx * width;
     const hy = h.ry * height;
-    ctx.font = `${Math.round(46 * scale)}px sans-serif`;
+    ctx.font = `${Math.round(48 * scale)}px sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(suit.heroEmoji, hx, hy);
 
-    // Yavru hayvanlar ve engeller
-    for (const it of this.gs.items) {
+    for (const it of items) {
       const ix = it.rx * width;
       const iy = it.ry * height;
-      ctx.fillStyle = it.kind === "baby" ? "rgba(46, 204, 113, 0.35)" : "rgba(239, 68, 68, 0.3)";
+      ctx.fillStyle = it.kind === "baby" ? "#ffffff" : "#fee2e2";
+      ctx.strokeStyle = it.kind === "baby" ? "#22c55e" : "#ef4444";
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(ix, iy, 26 * scale, 0, Math.PI * 2);
+      ctx.arc(ix, iy, 28 * scale, 0, Math.PI * 2);
       ctx.fill();
-      ctx.font = `${Math.round(34 * scale)}px sans-serif`;
+      ctx.stroke();
+      ctx.font = `${Math.round(32 * scale)}px sans-serif`;
       ctx.fillText(it.emoji, ix, iy);
     }
   }
@@ -1691,54 +1824,63 @@ class KidsGamesPortal {
   renderCuriousGeorge(ctx) {
     const { width, playTop, playH, scale } = this.layout;
     const mode = this.activeModeId;
+    const items = Array.isArray(this.gs?.items) ? this.gs.items : [];
+    const targets = Array.isArray(this.gs?.targets) ? this.gs.targets : [];
 
     if (mode === "balloons") {
-      ctx.font = `${Math.round(50 * scale)}px sans-serif`;
+      ctx.fillStyle = "#1e293b";
+      ctx.font = `900 ${Math.round(32 * scale)}px sans-serif`;
       ctx.textAlign = "center";
-      ctx.fillText(`🐵 🎈 x ${this.gs.extra.collected} / ${this.gs.extra.targetNum}`, width * 0.5, playTop + playH * 0.14);
+      ctx.fillText(`🐵 🎈 ${this.gs.extra?.collected || 0} / ${this.gs.extra?.targetNum || 4}`, width * 0.5, playTop + playH * 0.14);
 
-      for (const b of this.gs.items) {
+      for (const b of items) {
         if (b.collected) continue;
+        const br = b.r || 36;
         const fy = b.y + Math.sin(this.animTime * 3 + b.idx) * 6;
         ctx.fillStyle = b.color;
         ctx.beginPath();
-        ctx.arc(b.x, fy, b.r, 0, Math.PI * 2);
+        ctx.arc(b.x, fy, br, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 3;
         ctx.stroke();
 
-        ctx.fillStyle = "#0f172a";
-        ctx.font = `900 ${Math.round(b.r * 0.85)}px sans-serif`;
+        ctx.font = `${Math.round(br * 0.9)}px sans-serif`;
         ctx.textBaseline = "middle";
         ctx.fillText("🎈", b.x, fy);
       }
     } else if (mode === "baskets") {
-      const cur = this.gs.target;
+      const cur = this.gs?.target || { emoji: "🍎", color: "#ef4444" };
       const cx = width * 0.5;
-      const cy = playTop + playH * 0.25;
-      ctx.fillStyle = "rgba(255,255,255,0.12)";
+      const cy = playTop + playH * 0.24;
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = cur.color;
+      ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.arc(cx, cy, 52 * scale, 0, Math.PI * 2);
       ctx.fill();
-      ctx.font = `${Math.round(58 * scale)}px sans-serif`;
+      ctx.stroke();
+
+      ctx.font = `${Math.round(56 * scale)}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(cur.emoji, cx, cy);
 
-      for (const b of this.gs.targets) {
-        ctx.fillStyle = `${b.color}38`;
+      for (const b of targets) {
+        const bw = b.w || 110;
+        const bh = b.h || 100;
+        ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = b.color;
-        ctx.lineWidth = 3.5;
-        this.roundRect(ctx, b.x - b.w / 2, b.y - b.h / 2, b.w, b.h, 18, true, true);
-        ctx.font = `${Math.round(38 * scale)}px sans-serif`;
+        ctx.lineWidth = 4;
+        this.roundRect(ctx, b.x - bw / 2, b.y - bh / 2, bw, bh, 18, true, true);
+        ctx.font = `${Math.round(36 * scale)}px sans-serif`;
         ctx.fillText(`🧺 ${b.emoji}`, b.x, b.y - 10 * scale);
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = "#1e293b";
         ctx.font = `900 ${Math.round(14 * scale)}px sans-serif`;
-        ctx.fillText(b.label, b.x, b.y + b.h * 0.3);
+        ctx.fillText(b.label, b.x, b.y + bh * 0.3);
       }
     } else if (mode === "train") {
-      const seq = this.gs.extra.seq;
+      const seq = this.gs.extra?.seq || ["🔴", "🔵", "🔴", "🔵"];
       const totalCars = seq.length + 1;
       const carW = Math.min(78 * scale, (width - 40) / totalCars);
       const startX = (width - totalCars * carW) / 2;
@@ -1746,26 +1888,26 @@ class KidsGamesPortal {
 
       for (let i = 0; i < totalCars; i++) {
         const cx = startX + (i + 0.5) * carW;
-        ctx.fillStyle = i === seq.length ? "rgba(255, 217, 61, 0.28)" : "rgba(0, 242, 254, 0.2)";
-        ctx.strokeStyle = i === seq.length ? "#ffd93d" : "#00f2fe";
-        ctx.lineWidth = 3;
-        this.roundRect(ctx, cx - carW * 0.44, trainY - 36 * scale, carW * 0.88, 72 * scale, 12, true, true);
+        ctx.fillStyle = i === seq.length ? "#fef9c3" : "#ffffff";
+        ctx.strokeStyle = i === seq.length ? "#f59e0b" : "#0ea5e9";
+        ctx.lineWidth = 3.5;
+        this.roundRect(ctx, cx - carW * 0.44, trainY - 36 * scale, carW * 0.88, 72 * scale, 14, true, true);
         ctx.font = `${Math.round(32 * scale)}px sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillStyle = "#fff";
         ctx.fillText(i < seq.length ? seq[i] : "❓", cx, trainY);
       }
 
-      for (const it of this.gs.items) {
-        ctx.fillStyle = "rgba(255,255,255,0.14)";
-        ctx.strokeStyle = "#ffd93d";
-        ctx.lineWidth = 3;
+      for (const it of items) {
+        const ir = it.r || 40;
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
-        ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+        ctx.arc(it.x, it.y, ir, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
-        ctx.font = `${Math.round(it.r * 0.95)}px sans-serif`;
+        ctx.font = `${Math.round(ir * 0.95)}px sans-serif`;
         ctx.fillText(it.emoji, it.x, it.y);
       }
     }
@@ -1775,36 +1917,38 @@ class KidsGamesPortal {
   renderSuperWhy(ctx) {
     const { width, playTop, playH, scale } = this.layout;
     const mode = this.activeModeId;
+    const items = Array.isArray(this.gs?.items) ? this.gs.items : [];
 
     if (mode === "firstletter") {
-      const t = this.gs.target;
+      const t = this.gs?.target || SUPERWHY_WORDS[0];
       const cx = width * 0.5;
       const cy = playTop + playH * 0.27;
-      ctx.fillStyle = "rgba(255,255,255,0.12)";
-      ctx.strokeStyle = t.color;
-      ctx.lineWidth = 3;
-      this.roundRect(ctx, cx - 120 * scale, cy - 55 * scale, 240 * scale, 110 * scale, 20, true, true);
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#0ea5e9";
+      ctx.lineWidth = 4;
+      this.roundRect(ctx, cx - 125 * scale, cy - 55 * scale, 250 * scale, 110 * scale, 22, true, true);
 
       ctx.font = `${Math.round(52 * scale)}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(t.emoji, cx - 50 * scale, cy);
-      ctx.fillStyle = "#ffd93d";
+      ctx.fillText(t.emoji, cx - 52 * scale, cy);
+      ctx.fillStyle = "#db2777";
       ctx.font = `900 ${Math.round(26 * scale)}px sans-serif`;
       ctx.fillText(t.word, cx + 38 * scale, cy);
 
-      for (const it of this.gs.items) {
+      for (const it of items) {
+        const ir = it.r || 40;
         const isHint = this.hintTimer > 0 && it.letter === t.letter;
-        ctx.fillStyle = `${it.color}35`;
-        ctx.strokeStyle = isHint ? "#fff" : it.color;
-        ctx.lineWidth = isHint ? 5 : 3;
+        ctx.fillStyle = isHint ? "#fef9c3" : "#ffffff";
+        ctx.strokeStyle = isHint ? "#ec4899" : "#38bdf8";
+        ctx.lineWidth = isHint ? 5 : 4;
         ctx.beginPath();
-        ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+        ctx.arc(it.x, it.y, ir, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = "#fff";
-        ctx.font = `900 ${Math.round(it.r * 0.95)}px sans-serif`;
+        ctx.fillStyle = "#0369a1";
+        ctx.font = `900 ${Math.round(ir * 0.95)}px sans-serif`;
         ctx.fillText(it.letter, it.x, it.y);
       }
     } else if (mode === "alphabridge") {
@@ -1812,40 +1956,43 @@ class KidsGamesPortal {
       ctx.textAlign = "center";
       ctx.fillText("🐷 🌈 🏰", width * 0.5, playTop + playH * 0.18);
 
-      for (const it of this.gs.items) {
-        ctx.fillStyle = it.done ? "rgba(46, 204, 113, 0.45)" : "rgba(0, 242, 254, 0.2)";
-        ctx.strokeStyle = it.done ? "#2ecc71" : "#00f2fe";
-        ctx.lineWidth = 3;
-        this.roundRect(ctx, it.x - it.w / 2, it.y - it.h / 2, it.w, it.h, 16, true, true);
-        ctx.fillStyle = "#fff";
+      for (const it of items) {
+        const iw = it.w || 70;
+        const ih = it.h || 85;
+        ctx.fillStyle = it.done ? "#dcfce7" : "#ffffff";
+        ctx.strokeStyle = it.done ? "#22c55e" : "#0ea5e9";
+        ctx.lineWidth = 4;
+        this.roundRect(ctx, it.x - iw / 2, it.y - ih / 2, iw, ih, 18, true, true);
+        ctx.fillStyle = "#1e293b";
         ctx.font = `900 ${Math.round(30 * scale)}px sans-serif`;
         ctx.textBaseline = "middle";
         ctx.fillText(it.letter, it.x, it.y);
       }
     } else if (mode === "wordrocket") {
-      const wObj = this.gs.extra.wordObj;
+      const wObj = this.gs.extra?.wordObj || { word: "ELMA", emoji: "🍎" };
       ctx.font = `900 ${Math.round(24 * scale)}px sans-serif`;
-      ctx.fillStyle = "#ffd93d";
+      ctx.fillStyle = "#db2777";
       ctx.textAlign = "center";
       ctx.fillText(`${wObj.emoji} HEDEF KELİME: ${wObj.word}`, width * 0.5, playTop + 22 * scale);
 
-      const hx = this.gs.hero.rx * width;
-      const hy = this.gs.hero.ry * this.layout.height;
+      const hx = (this.gs.hero?.rx || 0.16) * width;
+      const hy = (this.gs.hero?.ry || 0.55) * this.layout.height;
       ctx.font = `${Math.round(48 * scale)}px sans-serif`;
       ctx.fillText("🚀", hx, hy);
 
-      for (const it of this.gs.items) {
+      for (const it of items) {
         if (it.collected) continue;
-        ctx.fillStyle = "rgba(255, 217, 61, 0.28)";
-        ctx.strokeStyle = "#ffd93d";
-        ctx.lineWidth = 3;
+        const ir = it.r || 36;
+        ctx.fillStyle = "#fef9c3";
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
-        ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+        ctx.arc(it.x, it.y, ir, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = "#fff";
-        ctx.font = `900 ${Math.round(it.r * 0.9)}px sans-serif`;
+        ctx.fillStyle = "#1e293b";
+        ctx.font = `900 ${Math.round(ir * 0.9)}px sans-serif`;
         ctx.textBaseline = "middle";
         ctx.fillText(it.letter, it.x, it.y);
       }
@@ -1856,63 +2003,63 @@ class KidsGamesPortal {
   renderPegCat(ctx) {
     const { width, playTop, playH, scale } = this.layout;
     const mode = this.activeModeId;
+    const items = Array.isArray(this.gs?.items) ? this.gs.items : [];
 
     if (mode === "pizza") {
       const px = width * 0.5;
-      const py = playTop + playH * 0.36;
-      const pr = Math.min(width, playH) * 0.25;
+      const py = playTop + playH * 0.35;
+      const pr = Math.min(width, playH) * 0.24;
 
-      // Pizza Hamuru ve Peynir
       ctx.fillStyle = "#f59e0b";
       ctx.beginPath();
       ctx.arc(px, py, pr, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = "#fde047";
+      ctx.fillStyle = "#fef08a";
       ctx.beginPath();
       ctx.arc(px, py, pr * 0.84, 0, Math.PI * 2);
       ctx.fill();
 
-      // Yerleştirilen şekiller
-      for (const top of this.gs.extra.toppingsOnPizza) {
+      for (const top of this.gs.extra?.toppingsOnPizza || []) {
         this.drawGeometricShape(ctx, top.shapeId, px + top.dx * pr, py + top.dy * pr, pr * 0.22, top.color);
       }
 
-      // Alt şekil seçenekleri
-      for (const it of this.gs.items) {
-        ctx.fillStyle = "rgba(255,255,255,0.12)";
+      for (const it of items) {
+        const ir = it.r || 34;
+        ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = it.color;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        this.drawGeometricShape(ctx, it.id, it.x, it.y - 4 * scale, it.r * 0.55, it.color);
-        ctx.fillStyle = "#fff";
-        ctx.font = `800 ${Math.round(11 * scale)}px sans-serif`;
-        ctx.textAlign = "center";
-        ctx.fillText(it.name, it.x, it.y + it.r * 0.75);
-      }
-    } else if (mode === "sizes") {
-      for (const it of this.gs.items) {
-        ctx.fillStyle = "rgba(255,255,255,0.12)";
-        ctx.strokeStyle = "#a66cff";
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+        ctx.arc(it.x, it.y, ir, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        this.drawGeometricShape(ctx, it.id, it.x, it.y - 4 * scale, ir * 0.52, it.color);
+        ctx.fillStyle = "#1e293b";
+        ctx.font = `900 ${Math.round(11 * scale)}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText(it.name, it.x, it.y + ir * 0.75);
+      }
+    } else if (mode === "sizes") {
+      for (const it of items) {
+        const ir = it.r || 48;
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#8b5cf6";
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.arc(it.x, it.y, ir, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = `${Math.round(38 * scale * it.scale)}px sans-serif`;
+        ctx.font = `${Math.round(36 * scale * (it.scale || 1))}px sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(it.emoji, it.x, it.y - 8 * scale);
 
-        ctx.fillStyle = "#ffd93d";
+        ctx.fillStyle = "#1e293b";
         ctx.font = `900 ${Math.round(12 * scale)}px sans-serif`;
-        ctx.fillText(it.label, it.x, it.y + it.r * 0.72);
+        ctx.fillText(it.label, it.x, it.y + ir * 0.72);
       }
     } else if (mode === "chickens") {
-      const ex = this.gs.extra;
+      const ex = this.gs.extra || { totalSeats: 5, currentChickens: 2 };
       const slotW = Math.min(68 * scale, (width - 40) / ex.totalSeats);
       const startX = (width - ex.totalSeats * slotW) / 2;
       const rocketY = playTop + playH * 0.32;
@@ -1920,24 +2067,24 @@ class KidsGamesPortal {
       for (let i = 0; i < ex.totalSeats; i++) {
         const sx = startX + (i + 0.5) * slotW;
         const filled = i < ex.currentChickens;
-        ctx.fillStyle = filled ? "rgba(46, 204, 113, 0.35)" : "rgba(255, 255, 255, 0.1)";
-        ctx.strokeStyle = filled ? "#2ecc71" : "#00f2fe";
-        ctx.lineWidth = 3;
-        this.roundRect(ctx, sx - slotW * 0.44, rocketY - 36 * scale, slotW * 0.88, 72 * scale, 14, true, true);
-        ctx.font = `${Math.round(32 * scale)}px sans-serif`;
+        ctx.fillStyle = filled ? "#dcfce7" : "#ffffff";
+        ctx.strokeStyle = filled ? "#22c55e" : "#0ea5e9";
+        ctx.lineWidth = 3.5;
+        this.roundRect(ctx, sx - slotW * 0.44, rocketY - 36 * scale, slotW * 0.88, 72 * scale, 16, true, true);
+        ctx.fillStyle = "#1e293b";
+        ctx.font = `900 ${Math.round(30 * scale)}px sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(filled ? "🐔" : `${i + 1}`, sx, rocketY);
       }
 
-      // Altta dokunulacak uzay tavuğu butonu
-      const btnY = playTop + playH * 0.75;
-      ctx.fillStyle = "rgba(255, 217, 61, 0.25)";
-      ctx.strokeStyle = "#ffd93d";
-      ctx.lineWidth = 3.5;
-      this.roundRect(ctx, width * 0.25, btnY - 38 * scale, width * 0.5, 76 * scale, 20, true, true);
-      ctx.fillStyle = "#fff";
-      ctx.font = `900 ${Math.round(20 * scale)}px sans-serif`;
+      const btnY = playTop + playH * 0.74;
+      ctx.fillStyle = "#fef9c3";
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 4;
+      this.roundRect(ctx, width * 0.18, btnY - 38 * scale, width * 0.64, 76 * scale, 22, true, true);
+      ctx.fillStyle = "#b45309";
+      ctx.font = `900 ${Math.round(18 * scale)}px sans-serif`;
       ctx.fillText("🐔 TAVUĞA DOKUN VE ROKETE BİNDİR! 🚀", width * 0.5, btnY);
     }
   }
@@ -1968,15 +2115,26 @@ class KidsGamesPortal {
     ctx.fill();
   }
 
+  // Tüm iOS Safari (iPhone/iPad) ve tarayıcılarla %100 uyumlu yuvarlatılmış dikdörtgen çizimi
   roundRect(ctx, x, y, w, h, r, fill = true, stroke = false) {
+    const radius = Math.max(0, Math.min(r, w / 2, h / 2));
     ctx.beginPath();
-    ctx.roundRect(x, y, w, h, r);
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + w - radius, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+    ctx.lineTo(x + w, y + h - radius);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+    ctx.lineTo(x + radius, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
     if (fill) ctx.fill();
     if (stroke) ctx.stroke();
   }
 
   drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
-    const words = text.split(" ");
+    const words = String(text || "").split(" ");
     let line = "";
     const lines = [];
     for (let n = 0; n < words.length; n++) {
@@ -2011,7 +2169,7 @@ class KidsGamesPortal {
     }
   }
 
-  addFloatingText(x, y, text, color = "#ffd93d") {
+  addFloatingText(x, y, text, color = "#db2777") {
     this.floatingLabels.push({ x, y, text, color, life: 1.0 });
   }
 
@@ -2046,10 +2204,12 @@ class KidsGamesPortal {
   // ==================== OLAY DİNLEYİCİLERİ (EVENTS) ====================
   bindEvents() {
     window.addEventListener("resize", () => {
-      if (this.state === "PLAYING") this.calculateGameArea();
+      if (this.state === "PLAYING") {
+        this.calculateGameArea();
+        this.renderGame();
+      }
     });
 
-    // Kategori sekmeleri (Çocuk Oyunları Menüsü)
     document.querySelectorAll(".cat-tab").forEach((btn) => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".cat-tab").forEach((b) => b.classList.remove("active"));
@@ -2060,7 +2220,6 @@ class KidsGamesPortal {
       });
     });
 
-    // Ses ve konuşma butonları
     document.getElementById("btn-toggle-voice")?.addEventListener("click", () => {
       KidsAudio.voiceEnabled = !KidsAudio.voiceEnabled;
       document.getElementById("voice-status-text").textContent = `🗣️ Sesli Rehber: ${KidsAudio.voiceEnabled ? "AÇIK" : "KAPALI"}`;
@@ -2077,7 +2236,6 @@ class KidsGamesPortal {
     document.getElementById("btn-toggle-sound")?.addEventListener("click", toggleSoundFn);
     document.getElementById("hud-btn-sound")?.addEventListener("click", toggleSoundFn);
 
-    // Çıkartma Albümü
     document.getElementById("btn-open-stickers")?.addEventListener("click", () => {
       KidsAudio.pop();
       this.renderStickerModal();
@@ -2089,7 +2247,6 @@ class KidsGamesPortal {
       this.showScreen("hub-screen");
     });
 
-    // Oyun Menüsü Geri & Başlat
     document.getElementById("gm-back-hub")?.addEventListener("click", () => {
       this.state = "HUB";
       this.renderHubGames();
@@ -2102,7 +2259,6 @@ class KidsGamesPortal {
       if (this.gameMeta) KidsAudio.speak(`${this.gameMeta.title}. ${this.gameMeta.desc}`);
     });
 
-    // Oyun içi üst bar
     document.getElementById("hud-btn-back")?.addEventListener("click", () => {
       this.state = "HUB";
       this.renderHubGames();
@@ -2114,30 +2270,30 @@ class KidsGamesPortal {
       this.showScreen("game-menu-screen");
     });
     document.getElementById("hud-btn-speak")?.addEventListener("click", () => {
-      KidsAudio.speak(this.gs.promptText || "");
+      KidsAudio.speak(this.gs?.promptText || "");
     });
 
-    // Alt dokunmatik yardımcı butonlar
     document.getElementById("btn-kid-hint")?.addEventListener("click", () => {
       this.hintTimer = 3.0;
       KidsAudio.pop();
-      KidsAudio.speak(this.gs.promptText || "Parlayan seçeneğe dokun!");
+      KidsAudio.speak(this.gs?.promptText || "Parlayan seçeneğe dokun!");
     });
     document.getElementById("btn-kid-next-task")?.addEventListener("click", () => {
       KidsAudio.pop();
       this.setupTaskForActiveGame();
+      this.calculateGameArea();
+      this.renderGame();
     });
 
-    // Yön tuşları (Wild Kratts & Super Why Roketi için)
     document.getElementById("td-up")?.addEventListener("pointerdown", () => {
       if (this.activeGameId === "pbs_wildkratts") {
         this.triggerHeroJumpOrMove();
-      } else if (this.gs.hero) {
+      } else if (this.gs?.hero) {
         this.gs.hero.ry = Math.max(0.24, (this.gs.hero.ry || 0.5) - 0.12);
       }
     });
     document.getElementById("td-down")?.addEventListener("pointerdown", () => {
-      if (this.gs.hero && this.activeModeId !== "cheetah") {
+      if (this.gs?.hero && this.activeModeId !== "cheetah") {
         this.gs.hero.ry = Math.min(0.82, (this.gs.hero.ry || 0.5) + 0.12);
       }
     });
@@ -2145,7 +2301,6 @@ class KidsGamesPortal {
       this.triggerHeroJumpOrMove();
     });
 
-    // Kutlama ekranı butonları
     document.getElementById("cel-btn-next")?.addEventListener("click", () => {
       const nextLvl = this.levelNum < 30 ? this.levelNum + 1 : 1;
       const nextMode = this.gameMeta.modes[(nextLvl - 1) % this.gameMeta.modes.length].id;
@@ -2160,11 +2315,11 @@ class KidsGamesPortal {
       this.showScreen("hub-screen");
     });
 
-    // Canvas dokunma ve sürükleme
     if (this.canvas) {
       this.canvas.addEventListener("pointerdown", (e) => {
         e.preventDefault();
         const rect = this.canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
         const px = ((e.clientX - rect.left) / rect.width) * this.layout.width;
         const py = ((e.clientY - rect.top) / rect.height) * this.layout.height;
         this.handleCanvasTap(px, py);
