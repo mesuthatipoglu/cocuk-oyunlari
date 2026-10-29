@@ -1,6 +1,29 @@
 // ÇOCUK OYUNLARI DÜNYASI (3-6 YAŞ) - PBS KIDS EN İYİ 5 OYUN & POPÜLER TABLET OYUNU
 // KURAL GEREĞİ TARİH VE SAAT İÇEREN VERSİYON NUMARASI:
-const APP_VERSION = "v2.0.0 - 2026-10-29 18:45";
+const APP_VERSION = "v2.0.1 - 2026-10-29 19:08";
+
+// Eğer tarayıcıda eski Service Worker önbelleğinden kalan eski index.html yüklendiyse (#game-stage yoksa),
+// tüm eski önbellekleri ve Service Worker'ı silip sayfayı temiz olarak yeniden yükle:
+(function ensureFreshDOMShell() {
+  if (typeof document !== "undefined" && !document.getElementById("game-stage")) {
+    Promise.all([
+      ("serviceWorker" in navigator)
+        ? navigator.serviceWorker.getRegistrations().then(function(regs) {
+            return Promise.all(regs.map(function(r) { return r.unregister(); }));
+          })
+        : Promise.resolve(),
+      ("caches" in window)
+        ? caches.keys().then(function(keys) {
+            return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+          })
+        : Promise.resolve()
+    ]).finally(function() {
+      if (window.location.search.indexOf("reloaded=1") === -1) {
+        window.location.replace(window.location.pathname + "?reloaded=1&t=" + Date.now());
+      }
+    });
+  }
+})();
 
 const KIDS_GAMES = [
   {

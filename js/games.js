@@ -1615,10 +1615,11 @@ class KidsGamesPortal {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  if (!document.getElementById("game-stage")) return;
   window.kidsPortal = new KidsGamesPortal();
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=20261029-1845")
+      .register("sw.js")
       .then((reg) => reg.update())
       .catch(() => {});
   }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cocuk-oyunlari-3-6-v20261029-1845';
+const CACHE_NAME = 'cocuk-oyunlari-3-6-v20261029-1908';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
