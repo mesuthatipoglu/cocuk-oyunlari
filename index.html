@@ -3,189 +3,198 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#7dd3fc" />
+  <meta name="theme-color" content="#38bdf8" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Çocuk Oyunları 3-6" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Çocuk Oyunları" />
   <meta name="description" content="3-6 Yaş Çocuk Oyunları: PBS KIDS En İyi 5 Oyunu (Daniel Tiger, Wild Kratts, Curious George, Super WHY!, Peg + Cat) ve En Çok Tutulan 3-6 Yaş Tablet Oyunu (Toca Mini Dünya)" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/svg+xml" href="icon.svg" />
-  <link rel="apple-touch-icon" href="icon.svg" />
-  <title>Çocuk Oyunları (3-6 Yaş) | PBS KIDS &amp; Popüler Tablet Oyunları - GamifyMyLesson</title>
-  <link rel="stylesheet" href="styles.css?v=20261025-0038" />
+  <link rel="manifest" href="manifest.json?v=20261029-1845" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg?v=20261029-1845" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20261029-1845" />
+  <title>Çocuk Oyunları (3-6 Yaş) | PBS KIDS &amp; Popüler Tablet Oyunları</title>
+  <link rel="stylesheet" href="styles.css?v=20261029-1845" />
+  <script>
+    // Eski önbellekleri temizle ve güncel Service Worker'a zorla
+    if ('caches' in window) {
+      caches.keys().then(function(keys) {
+        keys.forEach(function(k) {
+          if (k.indexOf('20261029-1845') === -1) caches.delete(k);
+        });
+      });
+    }
+  </script>
 </head>
 <body>
   <div id="app-root">
-    <!-- ==================== ANA MENÜ: ÇOCUK OYUNLARI PORTALI (3-6 YAŞ) ==================== -->
+    <!-- ==================== ANA MENÜ: ÇOCUK OYUNLARI MENÜSÜ (3-6 YAŞ) ==================== -->
     <section id="hub-screen" class="screen active">
-      <div class="bg-clouds"></div>
-      <div class="hub-container">
-        <header class="hub-header">
-          <div class="hub-top-links">
-            <a href="https://gamifymylesson.com" class="btn btn-portal-back">⬅️ GamifyMyLesson Ana Portal</a>
-            <!-- KURAL GEREĞİ TARİH VE SAAT İÇEREN VERSİYON NUMARASI -->
-            <div id="main-version-badge" class="version-badge">v1.1.0 - 2026-10-25 00:38</div>
-          </div>
-
-          <div class="badge-row">
-            <span class="pill-badge rainbow">🧸 3-6 YAŞ OKUL ÖNCESİ</span>
-            <span class="pill-badge gold">📺 PBS KIDS EN İYİ 5 OYUN</span>
-            <span class="pill-badge cyan">📱 EN ÇOK TUTULAN TABLET OYUNU</span>
-          </div>
-
-          <h1 class="main-logo">
-            <span class="logo-kids">ÇOCUK OYUNLARI</span>
-            <span class="logo-age">3-6 YAŞ DÜNYASI</span>
-          </h1>
-          <p class="main-subtitle">
-            Sesli Türkçe rehberli, reklamsız, tablet ve dokunmatik ekranlara tam uyumlu 6 eğitici &amp; eğlenceli oyun!
-          </p>
-
-          <!-- Oyuncu Yıldız, Çıkartma ve Ses Kontrol Barı -->
-          <div class="hub-stats-bar">
-            <div class="stat-pill star-pill">
-              <span>⭐ Yıldızlarım:</span>
-              <strong id="hub-total-stars">0</strong>
+      <div class="sunny-sky-decor"></div>
+      <div class="hub-wrapper">
+        <!-- Kompakt Üst Bar -->
+        <header class="hub-compact-bar">
+          <div class="hub-brand-row">
+            <a href="https://gamifymylesson.com" class="pill-btn portal-btn">⬅️ Ana Portal</a>
+            <div class="hub-title-group">
+              <h1 class="hub-main-title">🧸 ÇOCUK OYUNLARI MENÜSÜ <span class="age-badge">3-6 YAŞ</span></h1>
             </div>
-            <button id="btn-open-stickers" class="btn btn-gold btn-sm">
-              <span>📒 Çıkartma Albümüm (<span id="hub-sticker-count">0/24</span>)</span>
-            </button>
-            <button id="btn-toggle-voice" class="btn btn-secondary btn-sm">
-              <span id="voice-status-text">🗣️ Sesli Rehber: AÇIK</span>
-            </button>
-            <button id="btn-toggle-sound" class="btn btn-secondary btn-sm">
-              <span id="sound-status-text">🔊 Ses: AÇIK</span>
-            </button>
-            <button id="btn-install-pwa" class="btn btn-primary btn-sm hidden">
-              <span>📲 Tablete Kur (PWA)</span>
-            </button>
+            <!-- KURAL GEREĞİ TARİH VE SAAT İÇEREN VERSİYON NUMARASI -->
+            <div id="main-version-badge" class="version-badge">v2.0.0 - 2026-10-29 18:45</div>
+          </div>
+
+          <div class="hub-controls-row">
+            <!-- Kategori Filtresi -->
+            <div class="cat-pills" role="tablist" aria-label="Çocuk Oyunları Kategorileri">
+              <button class="cat-pill active" data-cat="all">🌈 Tümü (6 Oyun)</button>
+              <button class="cat-pill" data-cat="pbs">📺 PBS KIDS En İyi 5</button>
+              <button class="cat-pill" data-cat="tablet">📱 Popüler Tablet Oyunu</button>
+            </div>
+
+            <!-- Modal Butonları -->
+            <div class="hub-modal-btns">
+              <div class="star-counter-pill">⭐ <strong id="hub-total-stars">15</strong></div>
+              <button id="btn-open-stickers" class="pill-btn gold-btn">
+                📒 Çıkartmalar (<span id="hub-sticker-count">2/24</span>)
+              </button>
+              <button id="btn-open-info" class="pill-btn info-btn">
+                🔊 Ses &amp; Bilgi
+              </button>
+            </div>
           </div>
         </header>
 
-        <!-- ÇOCUK OYUNLARI MENÜSÜ SEKME FİLTRESİ -->
-        <nav class="kids-menu-nav" aria-label="Çocuk Oyunları Menüsü">
-          <div class="kids-menu-title">🧸 ÇOCUK OYUNLARI MENÜSÜ (3-6 YAŞ SEÇİMİ)</div>
-          <div class="category-tabs">
-            <button class="cat-tab active" data-cat="all">🌈 Tüm Çocuk Oyunları (6)</button>
-            <button class="cat-tab" data-cat="pbs">📺 PBS KIDS En İyi 5 Oyun</button>
-            <button class="cat-tab" data-cat="tablet">📱 En Çok Tutulan Tablet Oyunu</button>
-          </div>
-        </nav>
-
-        <!-- Oyun Kartları Izgarası -->
-        <div id="games-grid" class="games-grid"></div>
+        <!-- Büyük Resimli Oyun Kartları Izgarası -->
+        <main id="games-grid" class="games-grid"></main>
       </div>
     </section>
 
-    <!-- ==================== OYUN İÇİ BÖLÜM & MOD SEÇİM EKRANI ==================== -->
-    <section id="game-menu-screen" class="screen">
-      <div class="modal-panel wide-panel">
-        <div class="panel-header">
-          <button id="gm-back-hub" class="btn btn-secondary btn-sm">⬅️ ÇOCUK OYUNLARI MENÜSÜ</button>
-          <div class="gm-title-wrap">
-            <span id="gm-icon" class="gm-big-icon">🐯</span>
+    <!-- ==================== TAM EKRAN OYUN ALANI (%100 EKRAN KAPLAR) ==================== -->
+    <section id="play-screen" class="screen">
+      <!-- %100 Ekranı Kaplayan İnteraktif Oyun Sahnesi -->
+      <div id="game-stage" class="game-stage"></div>
+
+      <!-- Kutlama & Parçacık Efekt Katmanı -->
+      <canvas id="fx-canvas" class="fx-canvas"></canvas>
+
+      <!-- Minimal Yüzen Köşe Kontrolleri (Ekranı Küçültmez, Menülere Modal İle Eriştirir) -->
+      <div class="floating-top-left">
+        <button id="btn-float-hub" class="float-btn" title="Çocuk Oyunları Ana Menüsü">
+          <img src="assets/svg/house.svg" alt="Menü" class="float-icon" />
+          <span>Menü</span>
+        </button>
+        <button id="btn-float-rooms" class="float-btn rooms-btn" title="Odalar ve Aşamalar Menüsü">
+          <img src="assets/svg/palette.svg" alt="Odalar" class="float-icon" />
+          <span id="float-room-label">Odalar &amp; Bölümler</span>
+        </button>
+      </div>
+
+      <!-- Yüzen Kompakt Sesli Yönerge Balonu (Dokununca Sesli Okur) -->
+      <button id="btn-float-prompt" class="floating-prompt-pill" title="Sesli Dinlemek İçin Dokun">
+        <span class="prompt-speaker">🔊</span>
+        <span id="float-prompt-text">Yönergeyi dinlemek için dokun!</span>
+      </button>
+
+      <div class="floating-top-right">
+        <div class="float-pill star-pill-mini">
+          <img src="assets/svg/star.svg" alt="Yıldız" class="float-icon" />
+          <span id="hud-stars">15</span>
+        </div>
+        <div class="float-pill step-pill-mini" id="hud-step">0/4</div>
+        <button id="btn-float-hint" class="float-btn gold-float" title="İpucu Göster">💡</button>
+        <button id="btn-float-sound" class="float-btn" title="Ses Aç/Kapat">🔊</button>
+      </div>
+    </section>
+
+    <!-- ==================== MODAL 1: ODALAR, MODLAR & BÖLÜMLER MENÜSÜ ==================== -->
+    <div id="rooms-modal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <img id="rm-game-icon" src="assets/svg/tiger.svg" alt="Oyun" class="modal-game-logo" />
             <div>
-              <div id="gm-badge" class="gm-badge">PBS KIDS #1</div>
-              <h2 id="gm-title">DANIEL TIGER: DUYGU &amp; PAYLAŞIM</h2>
+              <div id="rm-game-badge" class="modal-badge">PBS KIDS</div>
+              <h2 id="rm-game-title">OYUN ODALARI &amp; AŞAMALAR</h2>
             </div>
           </div>
-          <button id="gm-play-now" class="btn btn-primary btn-sm">▶️ HEMEN OYNA</button>
+          <button id="btn-close-rooms" class="modal-close-btn">✕ KAPAT</button>
         </div>
 
-        <div class="gm-info-bar">
-          <p id="gm-desc"></p>
-          <button id="gm-speak-desc" class="btn btn-gold btn-sm">🗣️ Sesli Anlat</button>
-        </div>
+        <div class="modal-section-label">🎮 Oynamak İstediğin Odayı / Etkinliği Seç:</div>
+        <div id="rm-modes-grid" class="rm-modes-grid"></div>
 
-        <div class="section-subtitle">🎮 Oyun Odası / Etkinlik Modu Seç (Dokun ve Hemen Başla)</div>
-        <div id="gm-modes-row" class="modes-row"></div>
+        <div class="modal-section-label">🌟 30 Eğlenceli Aşama (İstediğin Aşamaya Dokun):</div>
+        <div id="rm-levels-grid" class="rm-levels-grid"></div>
 
-        <div class="section-subtitle">🌟 30 Eğlenceli Aşama (İstediğin Aşamadan Başlayabilirsin!)</div>
-        <div id="gm-levels-grid" class="levels-grid"></div>
-      </div>
-    </section>
-
-    <!-- ==================== AKTİF OYUN EKRANI (DİNAMİK ÖLÇEKLENEN CANVAS) ==================== -->
-    <section id="play-screen" class="screen">
-      <header id="play-hud" class="play-hud">
-        <div class="hud-left">
-          <button id="hud-btn-back" class="btn btn-secondary btn-sm">🏠 MENÜ</button>
-          <button id="hud-btn-levels" class="btn btn-secondary btn-sm">🗺️ ODALAR</button>
-          <div class="hud-title-box">
-            <div id="hud-game-title" class="hud-game-title">DANIEL TIGER</div>
-            <div id="hud-level-label" class="hud-level-label">Aşama 1</div>
-          </div>
-        </div>
-
-        <div class="hud-center">
-          <button id="hud-btn-speak" class="btn btn-gold btn-sm" title="Yönergeyi Sesli Tekrarla">
-            🗣️ <span id="hud-prompt-short">Dinle</span>
-          </button>
-        </div>
-
-        <div class="hud-right">
-          <div class="hud-pill star-count">⭐ <span id="hud-stars">0</span></div>
-          <div class="hud-pill progress-count">🎯 <span id="hud-step">1/5</span></div>
-          <button id="hud-btn-sound" class="hud-icon-btn" title="Ses Aç/Kapat">🔊</button>
-        </div>
-      </header>
-
-      <!-- Ekrana Göre Hesaplanan Dinamik Oyun Alanı -->
-      <div id="game-area-wrapper" class="game-area-wrapper">
-        <canvas id="kids-canvas"></canvas>
-        <div id="kids-toast" class="kids-toast hidden"></div>
-      </div>
-
-      <!-- Alt Tablet / Dokunmatik Büyük Kontrol & Yardım Barı -->
-      <footer id="kids-touch-bar" class="kids-touch-bar">
-        <div id="touch-mode-buttons" class="touch-mode-buttons"></div>
-        <div id="touch-dpad-row" class="touch-dpad-row hidden">
-          <button id="td-left" class="t-ctrl-btn">⬅️ SOL</button>
-          <button id="td-up" class="t-ctrl-btn t-jump-btn">⬆️ ZIPLA / YUKARI</button>
-          <button id="td-down" class="t-ctrl-btn">⬇️ AŞAĞI</button>
-          <button id="td-right" class="t-ctrl-btn">SAĞ ➡️</button>
-          <button id="td-action" class="t-ctrl-btn t-action-btn">✨ SÜPER GÜÇ</button>
-        </div>
-        <div id="touch-helper-row" class="touch-helper-row">
-          <button id="btn-kid-hint" class="btn btn-gold btn-sm">💡 İpucu Göster</button>
-          <span id="touch-instruction-text" class="touch-instruction-text">👆 Ekrandaki renkli nesnelere dokun!</span>
-          <button id="btn-kid-next-task" class="btn btn-secondary btn-sm">⏭️ Yeni Görev</button>
-        </div>
-      </footer>
-
-      <!-- Kutlama / Bölüm Sonu Katmanı -->
-      <div id="celebration-overlay" class="game-overlay hidden">
-        <div class="overlay-card celebration-card">
-          <div id="cel-big-emoji" class="cel-big-emoji">🎉</div>
-          <h2 id="cel-title">HARİKASIN!</h2>
-          <p id="cel-subtitle">Aşamayı başarıyla tamamladın!</p>
-          <div id="cel-stars" class="cel-stars">⭐⭐⭐</div>
-          <div id="cel-fact-box" class="cel-fact-box"></div>
-          <div id="cel-sticker-reward" class="cel-sticker-reward hidden"></div>
-          <div class="overlay-actions">
-            <button id="cel-btn-next" class="btn btn-primary btn-xl">⏭️ SONRAKİ AŞAMA</button>
-            <button id="cel-btn-retry" class="btn btn-secondary">🔄 TEKRAR OYNA</button>
-            <button id="cel-btn-hub" class="btn btn-outline">🏠 ÇOCUK OYUNLARI MENÜSÜ</button>
-          </div>
+        <div class="modal-footer-btns">
+          <button id="rm-btn-back-hub" class="pill-btn portal-btn">🏠 Tüm Çocuk Oyunları Menüsüne Dön</button>
+          <button id="rm-btn-resume" class="pill-btn play-now-btn">▶️ Oyuna Devam Et</button>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- ==================== ÇIKARTMA ALBÜMÜ (STICKER BOOK) ==================== -->
-    <section id="sticker-modal" class="screen">
-      <div class="modal-panel wide-panel">
-        <div class="panel-header">
-          <h2>📒 BENİM ÇIKARTMA ALBÜMÜM (24 SÜPER ÇIKARTMA)</h2>
-          <button id="btn-close-stickers" class="btn btn-secondary btn-sm">✕ KAPAT</button>
+    <!-- ==================== MODAL 2: ÇIKARTMA ALBÜMÜ ==================== -->
+    <div id="sticker-modal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>📒 BENİM ÇIKARTMA ALBÜMÜM (24 ÇIKARTMA)</h2>
+          <button id="btn-close-stickers" class="modal-close-btn">✕ KAPAT</button>
         </div>
-        <p class="album-desc">Oyunları oynadıkça yeni sevimli çıkartmalar kazanırsın! Üzerine dokunarak sesini dinle.</p>
+        <p class="modal-subtext">Oyunlarda aşamaları tamamladıkça yeni sevimli çıkartmalar açılır! Çıkartmaya dokunarak sesini dinle.</p>
         <div id="stickers-grid" class="stickers-grid"></div>
       </div>
-    </section>
+    </div>
+
+    <!-- ==================== MODAL 3: SES AYARLARI & OYUN BİLGİSİ ==================== -->
+    <div id="info-modal" class="modal-backdrop hidden">
+      <div class="modal-card small-modal">
+        <div class="modal-header">
+          <h2>🔊 SES AYARLARI &amp; REHBER</h2>
+          <button id="btn-close-info" class="modal-close-btn">✕ KAPAT</button>
+        </div>
+        <div class="settings-list">
+          <button id="btn-toggle-voice" class="setting-toggle-btn">
+            <span>🗣️ Türkçe Sesli Rehber:</span>
+            <strong id="voice-status-text">AÇIK</strong>
+          </button>
+          <button id="btn-toggle-sound" class="setting-toggle-btn">
+            <span>🎵 Müzik &amp; Ses Efektleri:</span>
+            <strong id="sound-status-text">AÇIK</strong>
+          </button>
+          <button id="btn-test-audio" class="pill-btn gold-btn" style="width:100%;justify-content:center;padding:12px">
+            🔔 Sesi ve Konuşmayı Şimdi Test Et
+          </button>
+        </div>
+        <div class="info-note-box">
+          <p><strong>🧸 3-6 Yaş Dostu Tasarım:</strong> Tüm oyunlar tam ekran çalışır. Oyun içindeyken sol üstteki <strong>"Odalar &amp; Bölümler"</strong> düğmesine dokunarak istediğiniz zaman oyun modunu değiştirebilirsiniz.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL 4: AŞAMA TAMAMLANDI KUTLAMASI ==================== -->
+    <div id="celebration-overlay" class="modal-backdrop hidden">
+      <div class="modal-card celebration-card">
+        <img id="cel-big-img" src="assets/svg/trophy.svg" alt="Kutlama" class="cel-trophy-img" />
+        <h2 id="cel-title">HARİKASIN!</h2>
+        <p id="cel-subtitle">Aşamayı başarıyla tamamladın!</p>
+        <div class="cel-stars-row">
+          <img src="assets/svg/star.svg" alt="Yıldız" class="cel-star-icon" />
+          <img src="assets/svg/star.svg" alt="Yıldız" class="cel-star-icon" />
+          <img src="assets/svg/star.svg" alt="Yıldız" class="cel-star-icon" />
+        </div>
+        <div id="cel-fact-box" class="cel-fact-box"></div>
+        <div id="cel-sticker-reward" class="cel-sticker-reward hidden"></div>
+        <div class="cel-actions">
+          <button id="cel-btn-next" class="pill-btn play-now-btn btn-xl">⏭️ SONRAKİ AŞAMA</button>
+          <div class="cel-sub-actions">
+            <button id="cel-btn-rooms" class="pill-btn gold-btn">🎮 Oda Değiştir</button>
+            <button id="cel-btn-hub" class="pill-btn portal-btn">🏠 Ana Menü</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script src="js/data.js?v=20261025-0038"></script>
-  <script src="js/games.js?v=20261025-0038"></script>
+  <script src="js/data.js?v=20261029-1845"></script>
+  <script src="js/games.js?v=20261029-1845"></script>
 </body>
 </html>

@@ -1,18 +1,17 @@
 :root {
-  --sky-top: #60a5fa;
+  --sky-top: #38bdf8;
   --sky-mid: #bae6fd;
-  --meadow-bot: #bbf7d0;
-  --panel-bg: rgba(255, 255, 255, 0.95);
-  --card-bg: #ffffff;
-  --cyan: #0ea5e9;
-  --yellow: #f59e0b;
-  --sunny: #fde047;
-  --orange: #fb923c;
+  --sunny-cream: #fef9c3;
+  --meadow-green: #86efac;
+  --card-white: #ffffff;
   --pink: #ec4899;
-  --green: #22c55e;
-  --purple: #8b5cf6;
-  --text-dark: #1e293b;
-  --text-muted: #475569;
+  --orange: #f97316;
+  --yellow: #f59e0b;
+  --blue: #0284c7;
+  --green: #16a34a;
+  --purple: #7c3aed;
+  --text-main: #0f172a;
+  --text-sub: #334155;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -32,8 +31,8 @@ html, body {
   height: 100%;
   height: 100dvh;
   overflow: hidden;
-  background: linear-gradient(180deg, #7dd3fc 0%, #e0f2fe 45%, #fef9c3 78%, #bbf7d0 100%);
-  color: var(--text-dark);
+  background: linear-gradient(180deg, #38bdf8 0%, #bae6fd 42%, #fef9c3 78%, #86efac 100%);
+  color: var(--text-main);
   font-family: 'Nunito', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
@@ -48,60 +47,61 @@ html, body {
   position: absolute;
   inset: 0;
   display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: calc(8px + var(--safe-top)) 10px calc(8px + var(--safe-bottom));
+  width: 100%;
+  height: 100%;
   z-index: 10;
 }
 
 .screen.active {
   display: flex;
+  flex-direction: column;
 }
 
 .hidden {
   display: none !important;
 }
 
-/* ==================== SEVİMLİ GÜNDÜZ & BULUT DEKORU ==================== */
-.bg-clouds {
+/* ==================== ANA MENÜ (KOMPAKT BAŞLIK + DEV RESİMLİ OYUN KARTLARI) ==================== */
+#hub-screen {
+  padding: calc(6px + var(--safe-top)) 10px calc(8px + var(--safe-bottom));
+}
+
+.sunny-sky-decor {
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(circle at 12% 14%, rgba(253, 224, 71, 0.75) 0%, rgba(253, 224, 71, 0) 18%),
-    radial-gradient(circle at 85% 18%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 20%),
-    radial-gradient(circle at 25% 32%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 16%),
-    radial-gradient(circle at 70% 75%, rgba(244, 114, 182, 0.18) 0%, transparent 28%);
+    radial-gradient(circle at 10% 12%, rgba(254, 240, 138, 0.9) 0%, rgba(254, 240, 138, 0) 16%),
+    radial-gradient(circle at 88% 15%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 18%),
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 14%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* ==================== ANA MENÜ (HUB) ==================== */
-.hub-container {
+.hub-wrapper {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1120px;
-  max-height: 100%;
-  overflow-y: auto;
-  background: var(--panel-bg);
-  border: 4px solid #fbbf24;
-  border-radius: 30px;
-  padding: 16px 18px;
-  box-shadow: 0 14px 36px rgba(14, 165, 233, 0.22), 0 0 0 6px rgba(255, 255, 255, 0.65);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.hub-header {
-  text-align: center;
+  max-width: 1240px;
+  height: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.hub-top-links {
+.hub-compact-bar {
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid #fbbf24;
+  border-radius: 22px;
+  padding: 8px 14px;
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.hub-brand-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -109,793 +109,852 @@ html, body {
   gap: 8px;
 }
 
-.btn-portal-back {
-  text-decoration: none;
-  background: #e0f2fe;
-  border: 2px solid #38bdf8;
-  color: #0369a1;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 0.82rem;
+.hub-main-title {
+  font-size: clamp(1.1rem, 2.6vw, 1.65rem);
   font-weight: 900;
-  box-shadow: 0 3px 0 #7dd3fc;
+  color: #db2777;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.age-badge {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  color: #fff;
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 999px;
 }
 
 .version-badge {
-  display: inline-block;
-  padding: 5px 14px;
+  padding: 4px 11px;
   border-radius: 999px;
   background: #fef3c7;
   border: 2px solid #f59e0b;
   color: #b45309;
   font-family: monospace;
-  font-size: 0.8rem;
-  font-weight: 900;
-}
-
-.badge-row {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.pill-badge {
-  font-size: 0.76rem;
-  font-weight: 900;
-  padding: 5px 13px;
-  border-radius: 999px;
-  letter-spacing: 0.3px;
-}
-
-.pill-badge.rainbow {
-  background: linear-gradient(90deg, #ec4899, #fb923c);
-  color: #ffffff;
-  box-shadow: 0 3px 8px rgba(236, 72, 153, 0.3);
-}
-
-.pill-badge.gold {
-  background: #fef08a;
-  color: #854d0e;
-  border: 2px solid #facc15;
-}
-
-.pill-badge.cyan {
-  background: #cffafe;
-  color: #0e7490;
-  border: 2px solid #22d3ee;
-}
-
-.main-logo {
-  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
-  font-weight: 900;
-  line-height: 1.1;
-}
-
-.logo-kids {
-  color: #ec4899;
-  text-shadow: 0 3px 0 #fbcfe8;
-}
-
-.logo-age {
-  display: inline-block;
-  margin-left: 8px;
-  color: #0284c7;
-  text-shadow: 0 3px 0 #bae6fd;
-}
-
-.main-subtitle {
-  font-size: 0.94rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  max-width: 760px;
-  margin: 0 auto;
-}
-
-.hub-stats-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 2px;
-}
-
-.stat-pill {
-  background: #fef9c3;
-  border: 2.5px solid #facc15;
-  color: #854d0e;
-  padding: 7px 16px;
-  border-radius: 999px;
-  font-size: 0.92rem;
-  font-weight: 900;
-  box-shadow: 0 3px 0 #fde047;
-}
-
-/* ==================== ÇOCUK OYUNLARI MENÜSÜ BAR ==================== */
-.kids-menu-nav {
-  background: linear-gradient(135deg, #f0f9ff 0%, #fdf2f8 100%);
-  border: 3px solid #7dd3fc;
-  border-radius: 22px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.kids-menu-title {
-  text-align: center;
-  font-size: 0.88rem;
-  font-weight: 900;
-  color: #db2777;
-  letter-spacing: 0.5px;
-}
-
-.category-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.cat-tab {
-  border: 2.5px solid #bae6fd;
-  background: #ffffff;
-  color: #0369a1;
-  border-radius: 16px;
-  padding: 10px 12px;
-  font-size: 0.86rem;
-  font-weight: 900;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 4px 0 #bae6fd;
-}
-
-.cat-tab.active {
-  background: linear-gradient(135deg, #ec4899, #fb923c);
-  color: #ffffff;
-  border-color: #f43f5e;
-  box-shadow: 0 4px 0 #be185d;
-  transform: translateY(-1px);
-}
-
-/* ==================== OYUN KARTLARI IZGARASI ==================== */
-.games-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-}
-
-.kid-game-card {
-  background: #ffffff;
-  border: 3.5px solid #38bdf8;
-  border-radius: 24px;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.14);
-}
-
-.kid-game-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 26px rgba(14, 165, 233, 0.24);
-}
-
-.kid-game-card.featured-tablet {
-  grid-column: 1 / -1;
-  background: linear-gradient(135deg, #fff1f2 0%, #fefce8 50%, #f0fdf4 100%);
-  border-width: 4px;
-  border-color: #ec4899;
-}
-
-.kg-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.kg-avatar {
-  width: 68px;
-  height: 68px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-
-.kg-meta {
-  flex: 1;
-}
-
-.kg-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-bottom: 4px;
-}
-
-.kg-tag {
-  font-size: 0.7rem;
-  font-weight: 900;
-  padding: 3px 10px;
-  border-radius: 999px;
-}
-
-.kg-meta h3 {
-  font-size: 1.12rem;
-  font-weight: 900;
-  line-height: 1.2;
-}
-
-.kg-skill {
-  font-size: 0.8rem;
-  color: #d97706;
-  font-weight: 800;
-  margin-top: 2px;
-}
-
-.kg-desc {
-  font-size: 0.85rem;
-  color: #334155;
-  font-weight: 600;
-  line-height: 1.42;
-}
-
-.kg-modes-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.kg-mode-chip {
-  font-size: 0.76rem;
-  font-weight: 800;
-  background: #f1f5f9;
-  border: 1.5px solid #cbd5e1;
-  padding: 4px 10px;
-  border-radius: 12px;
-  color: #1e293b;
-}
-
-.kg-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 2px;
-}
-
-.kg-progress {
-  font-size: 0.85rem;
-  font-weight: 900;
-  color: #b45309;
-  background: #fef3c7;
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-
-/* ==================== GENEL BUTONLAR ==================== */
-.btn {
-  border: none;
-  border-radius: 16px;
-  padding: 11px 18px;
-  font-size: 0.95rem;
-  font-weight: 900;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  color: #ffffff;
-  transition: transform 0.1s ease, filter 0.15s ease;
-}
-
-.btn:active {
-  transform: scale(0.95);
-}
-
-.btn-sm {
-  padding: 8px 14px;
-  font-size: 0.84rem;
-  border-radius: 14px;
-}
-
-.btn-xl {
-  padding: 15px 24px;
-  font-size: 1.15rem;
-  border-radius: 20px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #ec4899 0%, #fb923c 100%);
-  box-shadow: 0 4px 0 #be185d;
-  color: #ffffff;
-}
-
-.btn-secondary {
-  background: #e0f2fe;
-  border: 2px solid #38bdf8;
-  color: #0369a1;
-  box-shadow: 0 3px 0 #7dd3fc;
-}
-
-.btn-gold {
-  background: linear-gradient(135deg, #fde047 0%, #f59e0b 100%);
-  color: #78350f;
-  border: 2px solid #f59e0b;
-  box-shadow: 0 3px 0 #d97706;
-}
-
-.btn-outline {
-  background: #ffffff;
-  border: 2.5px solid #94a3b8;
-  color: #334155;
-}
-
-/* ==================== OYUN DETAY & AŞAMA SEÇİM PANELİ ==================== */
-.modal-panel {
-  width: 100%;
-  max-width: 960px;
-  max-height: 94dvh;
-  overflow-y: auto;
-  background: #ffffff;
-  border: 4px solid #38bdf8;
-  border-radius: 28px;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 18px 45px rgba(14, 165, 233, 0.25);
-}
-
-.panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  border-bottom: 2px dashed #bae6fd;
-  padding-bottom: 10px;
-}
-
-.gm-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.gm-big-icon {
-  font-size: 2.5rem;
-}
-
-.gm-badge {
   font-size: 0.74rem;
   font-weight: 900;
-  color: #d97706;
 }
 
-.gm-info-bar {
+.hub-controls-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  background: #f0f9ff;
-  border: 2px solid #bae6fd;
-  border-radius: 16px;
-  padding: 10px 14px;
-}
-
-.gm-info-bar p {
-  font-size: 0.9rem;
-  color: #1e293b;
-  font-weight: 700;
-  line-height: 1.4;
-}
-
-.section-subtitle {
-  font-size: 0.88rem;
-  font-weight: 900;
-  color: #0284c7;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.modes-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 10px;
-}
-
-.mode-select-btn {
-  background: #f8fafc;
-  border: 3px solid #cbd5e1;
-  border-radius: 18px;
-  padding: 12px;
-  color: #1e293b;
-  font-size: 0.92rem;
-  font-weight: 900;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  text-align: center;
-  transition: all 0.15s ease;
-  box-shadow: 0 4px 0 #cbd5e1;
-}
-
-.mode-select-btn.active {
-  background: linear-gradient(135deg, #fef9c3, #fce7f3);
-  border-color: #ec4899;
-  box-shadow: 0 4px 0 #f43f5e;
-}
-
-.levels-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  flex-wrap: wrap;
   gap: 8px;
-  max-height: 40dvh;
-  overflow-y: auto;
-  padding-right: 4px;
 }
 
-.lvl-card {
-  background: #f0f9ff;
-  border: 2.5px solid #7dd3fc;
-  border-radius: 16px;
-  padding: 10px 6px;
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.12s ease;
-  box-shadow: 0 3px 0 #bae6fd;
-}
-
-.lvl-card:hover {
-  transform: scale(1.04);
-  border-color: #f59e0b;
-  background: #fef9c3;
-}
-
-.lvl-num {
-  font-size: 1.02rem;
-  font-weight: 900;
-  color: #0369a1;
-}
-
-.lvl-mode-tag {
-  font-size: 0.68rem;
-  color: #475569;
-  font-weight: 800;
-  margin: 2px 0;
-}
-
-.lvl-stars {
-  font-size: 0.8rem;
-  font-weight: 900;
-  color: #d97706;
-}
-
-/* ==================== OYNANIŞ EKRANI (SEVİMLİ GÜNDÜZ TEMASI) ==================== */
-#play-screen {
-  padding: var(--safe-top) 0 var(--safe-bottom) 0;
-  justify-content: space-between;
-  background: linear-gradient(180deg, #bae6fd 0%, #fef9c3 60%, #bbf7d0 100%);
-  touch-action: none;
-}
-
-.play-hud {
-  width: 100%;
-  max-width: 1120px;
+.cat-pills {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 7px 12px;
-  background: rgba(255, 255, 255, 0.94);
-  border-bottom: 3px solid #fbbf24;
-  border-radius: 0 0 20px 20px;
-  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.15);
-  flex-shrink: 0;
-}
-
-.hud-left, .hud-right, .hud-center {
-  display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
-.hud-game-title {
-  font-size: 0.9rem;
+.cat-pill {
+  border: 2px solid #7dd3fc;
+  background: #f0f9ff;
+  color: #0369a1;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
   font-weight: 900;
-  color: #db2777;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.hud-level-label {
-  font-size: 0.75rem;
-  color: #0284c7;
-  font-weight: 800;
+.cat-pill.active {
+  background: linear-gradient(135deg, #ec4899, #f97316);
+  color: #ffffff;
+  border-color: #db2777;
+  box-shadow: 0 3px 10px rgba(236, 72, 153, 0.35);
 }
 
-.hud-pill {
+.hub-modal-btns {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.star-counter-pill {
   background: #fef9c3;
   border: 2px solid #facc15;
   color: #854d0e;
   padding: 5px 12px;
   border-radius: 999px;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   font-weight: 900;
 }
 
-.hud-icon-btn {
-  background: #e0f2fe;
-  border: 2px solid #38bdf8;
-  border-radius: 12px;
-  width: 40px;
-  height: 40px;
-  font-size: 1.15rem;
-  cursor: pointer;
-}
-
-.game-area-wrapper {
-  position: relative;
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  overflow: hidden;
-  padding: 4px;
-}
-
-#kids-canvas {
-  display: block;
-  background: #fffdf7;
-  border-radius: 24px;
-  box-shadow: 0 10px 28px rgba(14, 165, 233, 0.22), 0 0 0 4px #fbbf24;
-  touch-action: none;
-  cursor: pointer;
-}
-
-.kids-toast {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ffffff;
-  border: 3px solid #f59e0b;
-  color: #1e293b;
-  padding: 8px 18px;
+.pill-btn {
+  text-decoration: none;
+  border: 2px solid transparent;
   border-radius: 999px;
-  font-size: 0.95rem;
-  font-weight: 900;
-  pointer-events: none;
-  z-index: 15;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* ==================== ALT DOKUNMATİK KONTROL BARI ==================== */
-.kids-touch-bar {
-  width: 100%;
-  max-width: 1120px;
-  background: rgba(255, 255, 255, 0.95);
-  border-top: 3px solid #38bdf8;
-  border-radius: 20px 20px 0 0;
-  padding: 7px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex-shrink: 0;
-  box-shadow: 0 -4px 14px rgba(14, 165, 233, 0.12);
-}
-
-.touch-mode-buttons {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.touch-mode-chip {
-  background: #f1f5f9;
-  border: 2px solid #cbd5e1;
-  color: #334155;
   padding: 6px 13px;
-  border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 900;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.1s ease;
 }
 
-.touch-mode-chip.active {
-  background: linear-gradient(135deg, #ec4899, #fb923c);
-  color: #ffffff;
-  border-color: #be185d;
-  box-shadow: 0 2px 0 #be185d;
-}
-
-.touch-dpad-row {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr 1fr 1fr 1.2fr;
-  gap: 8px;
-}
-
-.t-ctrl-btn {
-  border: 2.5px solid #38bdf8;
-  background: #e0f2fe;
-  color: #0369a1;
-  border-radius: 16px;
-  padding: 10px 6px;
-  font-size: 0.9rem;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 3px 0 #7dd3fc;
-}
-
-.t-ctrl-btn:active {
+.pill-btn:active {
   transform: scale(0.95);
 }
 
-.t-jump-btn {
-  background: linear-gradient(135deg, #4ade80, #22c55e);
-  color: #ffffff;
-  border-color: #16a34a;
-  box-shadow: 0 3px 0 #15803d;
+.portal-btn {
+  background: #e0f2fe;
+  border-color: #38bdf8;
+  color: #0369a1;
 }
 
-.t-action-btn {
-  background: linear-gradient(135deg, #ec4899, #fb923c);
-  color: #ffffff;
-  border-color: #db2777;
-  box-shadow: 0 3px 0 #be185d;
+.gold-btn {
+  background: linear-gradient(135deg, #fde047, #f59e0b);
+  border-color: #d97706;
+  color: #78350f;
 }
 
-.touch-helper-row {
+.info-btn {
+  background: #f3e8ff;
+  border-color: #a855f7;
+  color: #6b21a8;
+}
+
+.play-now-btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-color: #15803d;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+}
+
+/* ==================== BÜYÜK RESİMLİ OYUN KARTLARI IZGARASI ==================== */
+.games-grid {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 2px 2px 6px 2px;
+}
+
+.kid-game-card {
+  background: #ffffff;
+  border: 4px solid #38bdf8;
+  border-radius: 26px;
+  padding: 14px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
   gap: 8px;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  box-shadow: 0 8px 22px rgba(2, 132, 199, 0.16);
+  position: relative;
+  overflow: hidden;
 }
 
-.touch-instruction-text {
-  font-size: 0.88rem;
-  font-weight: 900;
-  color: #0369a1;
-  text-align: center;
-  flex: 1;
+.kid-game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 28px rgba(2, 132, 199, 0.28);
 }
 
-/* ==================== KUTLAMA KATMANI ==================== */
-.game-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(14, 165, 233, 0.35);
-  backdrop-filter: blur(6px);
+.kg-illustration-banner {
+  width: 100%;
+  height: 112px;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  z-index: 30;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.8);
 }
 
-.overlay-card {
+.kg-main-art {
+  width: 78px;
+  height: 78px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.18));
+  animation: gentleFloat 2.8s ease-in-out infinite;
+}
+
+.kg-side-art {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.14));
+}
+
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(3deg); }
+}
+
+.kg-badge-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.kg-badge-pill {
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: #ffffff;
+}
+
+.kg-stars-pill {
+  font-size: 0.76rem;
+  font-weight: 900;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.kg-card-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.kg-modes-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.kg-mode-btn {
+  flex: 1 1 auto;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 11px;
+  padding: 5px 8px;
+  font-size: 0.73rem;
+  font-weight: 800;
+  color: #1e293b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.kg-mode-btn:hover {
+  background: #fef9c3;
+  border-color: #f59e0b;
+}
+
+.kg-mode-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+.kg-big-play-btn {
   width: 100%;
-  max-width: 480px;
+  border: none;
+  border-radius: 16px;
+  padding: 10px;
+  font-size: 0.96rem;
+  font-weight: 900;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== %100 TAM EKRAN OYUN SAHNESİ (#play-screen) ==================== */
+#play-screen {
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  position: relative;
+}
+
+.game-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.fx-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Minimal Yüzen Köşe Kontrolleri */
+.floating-top-left {
+  position: absolute;
+  top: calc(8px + var(--safe-top));
+  left: 10px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.floating-top-right {
+  position: absolute;
+  top: calc(8px + var(--safe-top));
+  right: 10px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.float-btn, .float-pill {
+  background: rgba(255, 255, 255, 0.92);
+  border: 2.5px solid #38bdf8;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+}
+
+.float-btn:active {
+  transform: scale(0.94);
+}
+
+.rooms-btn {
+  background: linear-gradient(135deg, #fef9c3, #fde047);
+  border-color: #f59e0b;
+  color: #78350f;
+}
+
+.gold-float {
+  background: #fef9c3;
+  border-color: #f59e0b;
+}
+
+.float-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.floating-prompt-pill {
+  position: absolute;
+  top: calc(8px + var(--safe-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 24;
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid #f59e0b;
+  border-radius: 999px;
+  padding: 7px 18px;
+  max-width: min(560px, 52vw);
+  font-size: clamp(0.78rem, 1.8vw, 0.98rem);
+  font-weight: 900;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  text-align: center;
+}
+
+.floating-prompt-pill:active {
+  transform: translateX(-50%) scale(0.96);
+}
+
+/* ==================== OYUN SAHNESİ İÇİ İNTERAKTİF BİLEŞENLER ==================== */
+.stage-world {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(58px + var(--safe-top)) 14px calc(14px + var(--safe-bottom));
+  overflow: hidden;
+}
+
+/* Arka plan sahne temaları */
+.theme-sunny-meadow {
+  background: linear-gradient(180deg, #38bdf8 0%, #bae6fd 52%, #86efac 52%, #4ade80 100%);
+}
+.theme-kitchen {
+  background: linear-gradient(180deg, #fce7f3 0%, #fbcfe8 58%, #fef08a 58%, #fde047 100%);
+}
+.theme-boutique {
+  background: linear-gradient(180deg, #f3e8ff 0%, #e9d5ff 60%, #fbcfe8 60%, #f472b6 100%);
+}
+.theme-bath {
+  background: linear-gradient(180deg, #cffafe 0%, #a5f3fc 62%, #e0f2fe 62%, #7dd3fc 100%);
+}
+.theme-savanna {
+  background: linear-gradient(180deg, #7dd3fc 0%, #fef08a 55%, #fde047 55%, #84cc16 100%);
+}
+.theme-ocean {
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 45%, #0369a1 100%);
+}
+.theme-pizzeria {
+  background: linear-gradient(180deg, #ffedd5 0%, #fed7aa 58%, #fca5a5 58%, #ef4444 100%);
+}
+.theme-space {
+  background: linear-gradient(180deg, #60a5fa 0%, #93c5fd 60%, #cbd5e1 60%, #94a3b8 100%);
+}
+
+/* Sahne Dekor Bulutları ve Güneş */
+.scene-deco-sun {
+  position: absolute;
+  top: 62px;
+  right: 28px;
+  width: 68px;
+  height: 68px;
+  pointer-events: none;
+  animation: spinSlow 24s linear infinite;
+}
+
+.scene-deco-cloud {
+  position: absolute;
+  top: 70px;
+  left: 34px;
+  width: 74px;
+  height: 74px;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: gentleFloat 4s ease-in-out infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Merkez Sahne / Karakter Vitrin Kutusu */
+.stage-showcase {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.hero-mascot-box {
+  background: rgba(255, 255, 255, 0.94);
+  border: 5px solid #fbbf24;
+  border-radius: 34px;
+  padding: 16px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  transition: transform 0.18s ease;
+  position: relative;
+}
+
+.hero-mascot-box:active {
+  transform: scale(0.95);
+}
+
+.hero-mascot-img {
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
+  animation: gentleFloat 2.4s ease-in-out infinite;
+}
+
+.hero-mascot-label {
+  font-weight: 900;
+  color: #0f172a;
+  background: #fef9c3;
+  border: 2px solid #f59e0b;
+  padding: 4px 14px;
+  border-radius: 999px;
+}
+
+/* Etkileşimli Seçenek Kartları Izgarası */
+.stage-choices-grid {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.choice-card {
+  background: rgba(255, 255, 255, 0.96);
+  border: 4px solid #38bdf8;
+  border-radius: 26px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 8px 0 rgba(14, 165, 233, 0.28), 0 12px 24px rgba(0, 0, 0, 0.12);
+  transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.15s ease;
+  position: relative;
+}
+
+.choice-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.choice-card:active {
+  transform: translateY(2px) scale(0.96);
+}
+
+.choice-card.hint-glow {
+  border-color: #f59e0b !important;
+  background: #fef9c3 !important;
+  box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.45), 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  animation: pulseHint 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes pulseHint {
+  from { transform: scale(1); }
+  to { transform: scale(1.07); }
+}
+
+.choice-art {
+  object-fit: contain;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.16));
+  pointer-events: none;
+}
+
+.choice-title {
+  font-weight: 900;
+  color: #0f172a;
+  text-align: center;
+  line-height: 1.15;
+  pointer-events: none;
+}
+
+/* ==================== MODALLAR (ODALAR, ÇIKARTMALAR, KUTLAMA) ==================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 880px;
+  max-height: 90dvh;
+  overflow-y: auto;
   background: #ffffff;
   border: 4px solid #fbbf24;
   border-radius: 30px;
-  padding: 24px;
-  text-align: center;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.35);
+}
+
+.small-modal {
+  max-width: 480px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  border-bottom: 2px dashed #bae6fd;
+  padding-bottom: 10px;
 }
 
-.cel-big-emoji {
-  font-size: 3.8rem;
+.modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.cel-stars {
-  font-size: 2.3rem;
-  letter-spacing: 6px;
+.modal-game-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
 }
 
-.cel-fact-box {
-  background: #f0f9ff;
-  border: 2px solid #7dd3fc;
-  border-radius: 16px;
-  padding: 12px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #0369a1;
-  line-height: 1.4;
-}
-
-.cel-sticker-reward {
-  background: #fef9c3;
-  border: 2.5px dashed #f59e0b;
-  border-radius: 16px;
-  padding: 10px 12px;
-  font-size: 0.92rem;
+.modal-badge {
+  font-size: 0.72rem;
   font-weight: 900;
+  color: #db2777;
+}
+
+.modal-close-btn {
+  background: #fee2e2;
+  border: 2px solid #f87171;
+  color: #b91c1c;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.84rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.modal-section-label {
+  font-size: 0.86rem;
+  font-weight: 900;
+  color: #0284c7;
+  text-transform: uppercase;
+}
+
+.rm-modes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 10px;
+}
+
+.rm-mode-card {
+  background: #f8fafc;
+  border: 3px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.rm-mode-card.active {
+  background: #fef9c3;
+  border-color: #f59e0b;
+  box-shadow: 0 4px 0 #d97706;
+}
+
+.rm-mode-card img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.rm-levels-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  max-height: 34dvh;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.rm-lvl-btn {
+  background: #f0f9ff;
+  border: 2.5px solid #7dd3fc;
+  border-radius: 14px;
+  padding: 8px 4px;
+  text-align: center;
+  font-weight: 900;
+  color: #0369a1;
+  cursor: pointer;
+}
+
+.rm-lvl-btn.active {
+  background: #fef9c3;
+  border-color: #f59e0b;
   color: #b45309;
 }
 
-.overlay-actions {
+.modal-footer-btns {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 4px;
 }
 
-/* ==================== ÇIKARTMA ALBÜMÜ ==================== */
-.album-desc {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
+/* Çıkartma Albümü Izgarası */
 .stickers-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
   gap: 10px;
 }
 
 .sticker-card {
   background: #f8fafc;
   border: 2.5px solid #cbd5e1;
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 12px 8px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   cursor: pointer;
-  transition: transform 0.15s ease;
 }
 
 .sticker-card.unlocked {
   background: linear-gradient(135deg, #fef9c3, #e0f2fe);
   border-color: #f59e0b;
-  box-shadow: 0 4px 0 #fde047;
 }
 
 .sticker-card.locked {
-  opacity: 0.5;
+  opacity: 0.45;
   filter: grayscale(1);
 }
 
-.sticker-emoji {
-  font-size: 2.5rem;
+.sticker-card img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
 }
 
 .sticker-name {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 900;
-  color: #1e293b;
-  margin-top: 4px;
+  text-align: center;
 }
 
-/* ==================== MOBİL & TABLET MEDYA SORGULARI ==================== */
-@media (max-width: 720px) {
+/* Ses Ayarları & Kutlama */
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.setting-toggle-btn {
+  background: #f0f9ff;
+  border: 2.5px solid #7dd3fc;
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.info-note-box {
+  background: #fef9c3;
+  border: 2px solid #facc15;
+  border-radius: 16px;
+  padding: 12px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.celebration-card {
+  max-width: 460px;
+  text-align: center;
+  align-items: center;
+}
+
+.cel-trophy-img {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  animation: gentleFloat 2s ease-in-out infinite;
+}
+
+.cel-stars-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.cel-star-icon {
+  width: 44px;
+  height: 44px;
+}
+
+.cel-fact-box {
+  background: #f0f9ff;
+  border: 2px solid #7dd3fc;
+  border-radius: 18px;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #0369a1;
+}
+
+.cel-sticker-reward {
+  background: #fef9c3;
+  border: 2.5px dashed #f59e0b;
+  border-radius: 18px;
+  padding: 10px 14px;
+  font-weight: 900;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cel-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cel-sub-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-xl {
+  padding: 14px 20px;
+  font-size: 1.1rem;
+  justify-content: center;
+}
+
+/* ==================== DUYARLI (MOBİL / TABLET / LAPTOP) KURALLAR ==================== */
+@media (max-width: 960px) {
+  .games-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
   .games-grid {
     grid-template-columns: 1fr;
   }
-  .category-tabs {
-    grid-template-columns: 1fr;
-  }
-  .levels-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .touch-dpad-row {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .touch-instruction-text {
+  .floating-prompt-pill {
+    top: calc(50px + var(--safe-top));
+    max-width: 92vw;
+    padding: 5px 12px;
     font-size: 0.78rem;
+  }
+  .stage-world {
+    padding-top: calc(92px + var(--safe-top));
+  }
+  .rm-levels-grid {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
